@@ -1,0 +1,428 @@
+﻿"Survey name";"Form name";"Form number";"Field number";"Exported field type";"Original field type";"Variable name";"Field label";"Optiongroup name";"Field required";"Field min";"Field max";"Field units";"Field info";"Calculation/summary template";"Field hidden";"Dependency parent name";"Field dependency operator";"Field dependency value"
+ACT;"ACT (1)";2;2;radio;radio;ACT_01;"Hoe is het vandaag met je astma?";ACT_01_Score;1;;;;;;0;;;
+ACT;"ACT (1)";2;4;radio;radio;ACT_02;"Hoeveel last heb je van je astma als je rent, traint of sport?";ACT_02_Score;1;;;;;;0;;;
+ACT;"ACT (1)";2;6;radio;radio;ACT_03;"Moet je hoesten door je astma?";ACT_03_04_Score;1;;;;;;0;;;
+ACT;"ACT (1)";2;8;radio;radio;ACT_04;"Word je ’s nachts wakker door je astma?";ACT_03_04_Score;1;;;;;;0;;;
+ACT;"ACT (2)";3;2;radio;radio;ACT_05;"Hoeveel dagen had je kind de afgelopen 4 weken overdag astmaklachten?";ACT_ouder_score;1;;;;;;0;;;
+ACT;"ACT (2)";3;4;radio;radio;ACT_06;"Hoeveel dagen had je kind de afgelopen 4 weken overdag last van piepende ademhaling door het astma?";ACT_ouder_score;1;;;;;;0;;;
+ACT;"ACT (2)";3;6;radio;radio;ACT_07;"Hoe vaak werd je kind de afgelopen 4 weken ’s nachts wakker door het astma?";ACT_ouder_score;1;;;;;;0;;;
+EQ-5D-5L;"EQ-5D-5L (1)";2;1;radio;radio;EQ5D5L1;Mobiliteit;EQ5D5L1;1;;;;;;0;;;
+EQ-5D-5L;"EQ-5D-5L (1)";2;2;radio;radio;EQ5D5L2;Zelfzorg;EQ5D5L2;1;;;;;;0;;;
+EQ-5D-5L;"EQ-5D-5L (1)";2;3;radio;radio;EQ5D5L3;"Dagelijkse activiteiten (bijvoorbeeld werk, studie, huishouden, gezins- en vrijetijdsactiviteiten)";EQ5D5L3;1;;;;;;0;;;
+EQ-5D-5L;"EQ-5D-5L (1)";2;4;radio;radio;EQ5D5L4;"Pijn / ongemak";EQ5D5L4;1;;;;;;0;;;
+EQ-5D-5L;"EQ-5D-5L (1)";2;5;radio;radio;EQ5D5L5;"Angst / somberheid";EQ5D5L5;1;;;;;;0;;;
+EQ-5D-5L;"EQ-5D-5L (2)";3;1;slider;slider;EQ5D5LVAS;"Geef uw gezondheidstoestand VANDAAG op de meetschaal aan";;1;0;100;;;;0;;;
+EQ-5D-5L;"EQ-5D-5L (2)";3;2;calculation;calculation;EQ5D5LVASRes;"Uw gezondheidstoestand VANDAAG";;0;;;;;{EQ5D5LVAS};0;;;
+EQ-5D-Y;"EQ-5D-Y (1)";2;1;radio;radio;EQ5DY1;"Beweging (lopen)";EQ5DY1;1;;;;;;0;;;
+EQ-5D-Y;"EQ-5D-Y (1)";2;2;radio;radio;EQ5DY2;"Voor zichzelf zorgen";EQ5DY2;1;;;;;;0;;;
+EQ-5D-Y;"EQ-5D-Y (1)";2;3;radio;radio;EQ5DY3;"Dagelijkse activiteiten (bijvoorbeeld naar school gaan, hobby’s, sporten, spelen, naar familie of vrienden gaan)";EQ5DY3;1;;;;;;0;;;
+EQ-5D-Y;"EQ-5D-Y (1)";2;4;radio;radio;EQ5DY4;"Pijn of andere klachten";EQ5DY4;1;;;;;;0;;;
+EQ-5D-Y;"EQ-5D-Y (1)";2;5;radio;radio;EQ5DY5;"Bezorgd, verdrietig of ongelukkig";EQ5DY5;1;;;;;;0;;;
+EQ-5D-Y;"EQ-5D-Y (2)";3;1;slider;slider;EQ5DYVAS;"Geef de gezondheidstoestand van uw kind VANDAAG op de meetschaal aan";;1;0;100;;;;0;;;
+EQ-5D-Y;"EQ-5D-Y (2)";3;2;calculation;calculation;EQ5DYVASRes;"Gezondheidstoestand van uw kind VANDAAG";;0;;;;;{EQ5DYVAS};0;;;
+HCSRU;"HCSRU (1)";2;1;radio;radio;HCSRU01;"Ouder A betreft";HCSRU01;1;;;;;;0;;;
+HCSRU;"HCSRU (1)";2;2;radio;radio;HCSRU02;"Wat is op dit moment van toepassing op Ouder A?";HCSRU02;1;;;;;;0;;;
+HCSRU;"HCSRU (1)";2;2.1;string;string;HCSRU02Oth;"Anders, namelijk";;1;;;;;;0;"Wat is op dit moment van toepassing op Ouder A?";==;98
+HCSRU;"HCSRU (1)";2;3;calculation;calculation;HCSRU02Calc;HCSRU02Calc;;0;;;;;"var check = {HCSRU02};if (check == 7 || check == 8) {1}else if (check == 1 || check == 2 || check == 98) {2}else {0}";1;;;
+HCSRU;"HCSRU (2)";3;1;numeric;numeric;HCSRU03;"Voor hoeveel uur per week is Ouder A werkzaam (in loondienst of als zelfstandig ondernemer)?";;1;;;"uren per week";;;0;HCSRU02Calc;>;0
+HCSRU;"HCSRU (2)";3;2;numeric;numeric;HCSRU04;"Over hoeveel dagen per week zijn deze uren verdeeld?";;1;0;7;"dagen per week";;;0;HCSRU02Calc;>;0
+HCSRU;"HCSRU (2)";3;3;string;string;HCSRU05;"Wat is het beroep van Ouder A?";;1;;;;;;0;HCSRU02Calc;>;1
+HCSRU;"HCSRU (2)";3;4;radio;radio;HCSRU06a;"Kunt u het netto inkomen uit betaald werk van Ouder A, d.w.z. na aftrek van belastingen en premies, doorgeven?";HCSRU06a;1;;;;;;0;HCSRU02Calc;>;1
+HCSRU;"HCSRU (2)";3;4.1;numeric;numeric;HCSRU06b;"Wat is het netto inkomen uit betaald werk van Ouder A, d.w.z. na aftrek van belastingen en premies?";;1;;;euro;;;0;"Kunt u het netto inkomen uit betaald werk van Ouder A, d.w.z. na aftrek van belastingen en premies, doorgeven?";==;1
+HCSRU;"HCSRU (2)";3;4.2;radio;radio;HCSRU06c;"Het netto inkomen uit betaald werk van Ouder A is uitgedrukt in";HCSRU06c;1;;;;;;0;"Kunt u het netto inkomen uit betaald werk van Ouder A, d.w.z. na aftrek van belastingen en premies, doorgeven?";==;1
+HCSRU;"HCSRU (2)";3;5;radio;radio;HCSRU07;"Ouder B betreft";HCSRU07;1;;;;;;0;;;
+HCSRU;"HCSRU (2)";3;5.1;radio;radio;HCSRU08;"Wat is op dit moment van toepassing op Ouder B?";HCSRU02;1;;;;;;0;"Ouder B betreft";!=;97
+HCSRU;"HCSRU (2)";3;5.1.1;string;string;HCSRU08Oth;"Anders, namelijk";;1;;;;;;0;"Wat is op dit moment van toepassing op Ouder B?";==;98
+HCSRU;"HCSRU (2)";3;5.2;calculation;calculation;HCSRU08Calc;HCSRU02Calc;;0;;;;;"var check = {HCSRU08};if (check == 7 || check == 8) {1}else if (check == 1 || check == 2 || check == 98) {2}else {0}";1;"Ouder B betreft";!=;97
+HCSRU;"HCSRU (3)";4;1;numeric;numeric;HCSRU09;"Voor hoeveel uur per week is Ouder B werkzaam (in loondienst of als zelfstandig ondernemer)?";;1;;;"uren per week";;;0;HCSRU02Calc;>;0
+HCSRU;"HCSRU (3)";4;2;numeric;numeric;HCSRU10;"Over hoeveel dagen per week zijn deze uren verdeeld?";;1;0;7;"dagen per week";;;0;HCSRU02Calc;>;0
+HCSRU;"HCSRU (3)";4;3;string;string;HCSRU11;"Wat is het beroep van Ouder B?";;1;;;;;;0;HCSRU02Calc;>;1
+HCSRU;"HCSRU (3)";4;4;radio;radio;HCSRU12a;"Kunt u het netto inkomen uit betaald werk van Ouder B, d.w.z. na aftrek van belastingen en premies, doorgeven?";HCSRU06a;1;;;;;;0;HCSRU02Calc;>;1
+HCSRU;"HCSRU (3)";4;4.1;numeric;numeric;HCSRU12b;"Wat is het netto inkomen uit betaald werk van Ouder B, d.w.z. na aftrek van belastingen en premies?";;1;;;euro;;;0;"Kunt u het netto inkomen uit betaald werk van Ouder B, d.w.z. na aftrek van belastingen en premies, doorgeven?";==;1
+HCSRU;"HCSRU (3)";4;4.2;radio;radio;HCSRU12c;"Het netto inkomen uit betaald werk van Ouder B is uitgedrukt in";HCSRU06c;1;;;;;;0;"Kunt u het netto inkomen uit betaald werk van Ouder B, d.w.z. na aftrek van belastingen en premies, doorgeven?";==;1
+HCSRU;"HCSRU (4)";5;1;radio;radio;HCSRUWho;"Wie vult deze vragenlijst in";HCSRU01;1;;;;;;0;;;
+HCSRU;"HCSRU (4)";5;2;radio;radio;HCSRU13a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";HCSRU13a1;1;;;;;;0;;;
+HCSRU;"HCSRU (4)";5;2.1;numeric;numeric;HCSRU13a2;"Hoeveel keer contact met de huisarts?";;1;1;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (4)";5;2.3;numeric;numeric;HCSRU13b1;"Een bezoek heeft gebracht aan de huisarts";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (4)";5;2.4;numeric;numeric;HCSRU13b2;"Aan huis bent bezocht door de huisarts";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (4)";5;2.5;numeric;numeric;HCSRU13b3;"Een telefonisch consult heeft gehad met de huisarts";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (4)";5;2.6;numeric;numeric;HCSRU13b4;"Een herhaalrecept heeft verkregen bij de doktersassistent";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (4)";5;2.7;numeric;numeric;HCSRU13b5;"Een bezoek heeft gebracht aan de huisartsenpost";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (4)";5;2.3.2;numeric;numeric;HCSRU13c1;"Lopend of met de fiets";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisarts";>=;1
+HCSRU;"HCSRU (4)";5;2.3.3;numeric;numeric;HCSRU13c2;"Met de auto";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisarts";>=;1
+HCSRU;"HCSRU (4)";5;2.3.4;numeric;numeric;HCSRU13c3;"Met het openbaar vervoer";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisarts";>=;1
+HCSRU;"HCSRU (4)";5;2.3.5;numeric;numeric;HCSRU13c4;"Met de taxi";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisarts";>=;1
+HCSRU;"HCSRU (4)";5;2.7.2;numeric;numeric;HCSRU13d1;"Lopend of met de fiets";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisartsenpost";>=;1
+HCSRU;"HCSRU (4)";5;2.7.3;numeric;numeric;HCSRU13d2;"Met de auto";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisartsenpost";>=;1
+HCSRU;"HCSRU (4)";5;2.7.4;numeric;numeric;HCSRU13d3;"Met het openbaar vervoer";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisartsenpost";>=;1
+HCSRU;"HCSRU (4)";5;2.7.5;numeric;numeric;HCSRU13d4;"Met de taxi";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisartsenpost";>=;1
+HCSRU;"HCSRU (5)";6;1;radio;radio;HCSRU14a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";HCSRU13a1;1;;;;;;0;;;
+HCSRU;"HCSRU (5)";6;1.1;numeric;numeric;HCSRU14a2;"Hoeveel keer een bezoek aan de spoedeisende hulp?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (5)";6;1.3;numeric;numeric;HCSRU14b1;"Lopend of met de fiets";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (5)";6;1.4;numeric;numeric;HCSRU14b2;"Met de auto";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (5)";6;1.5;numeric;numeric;HCSRU14b3;"Met het openbaar vervoer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (5)";6;1.6;numeric;numeric;HCSRU14b4;"Met de taxi";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (5)";6;1.7;numeric;numeric;HCSRU14b5;"Met de ambulance";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1;radio;radio;HCSRU15a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";HCSRU13a1;1;;;;;;0;;;
+HCSRU;"HCSRU (6)";7;1.1;numeric;numeric;HCSRU15a2;"Hoeveel keer een bezoek in het ziekenhuis?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.2;numeric;numeric;HCSRU15a3;"Hoeveel keer telefonisch contact?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.4;numeric;numeric;HCSRU15b1;"Lopend of met de fiets";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.5;numeric;numeric;HCSRU15b2;"Met de auto";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.6;numeric;numeric;HCSRU15b3;"Met het openbaar vervoer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.7;numeric;numeric;HCSRU15b4;"Met de taxi";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.9;string;string;HCSRU15c1;"Naam ziekenhuis";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.10;string;string;HCSRU15c2;"Plaatsnaam ziekenhuis";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.12;string;string;HCSRU15d1a;"Wat voor medisch specialist";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.13;numeric;numeric;HCSRU15d2a;"Hoeveel keer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.14;radio;radio;HCSRU15d3a;"Met nog een medisch specialist contact gehad?";NeeJa;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (6)";7;1.14.1;string;string;HCSRU15d1b;"Wat voor medisch specialist";;1;;;;;;0;"Met nog een medisch specialist contact gehad?";==;1
+HCSRU;"HCSRU (6)";7;1.14.2;numeric;numeric;HCSRU15d2b;"Hoeveel keer";;1;;;keer;;;0;"Met nog een medisch specialist contact gehad?";==;1
+HCSRU;"HCSRU (6)";7;1.14.3;radio;radio;HCSRU15d3b;"Met nog een medisch specialist contact gehad?";NeeJa;1;;;keer;;;0;"Met nog een medisch specialist contact gehad?";==;1
+HCSRU;"HCSRU (6)";7;1.14.3.1;string;string;HCSRU15d1c;"Wat voor medisch specialist";;1;;;;;;0;"Met nog een medisch specialist contact gehad?";==;1
+HCSRU;"HCSRU (6)";7;1.14.3.2;numeric;numeric;HCSRU15d2c;"Hoeveel keer";;1;;;keer;;;0;"Met nog een medisch specialist contact gehad?";==;1
+HCSRU;"HCSRU (7)";8;1;radio;radio;HCSRU16a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";HCSRU13a1;1;;;;;;0;;;
+HCSRU;"HCSRU (7)";8;1.1;numeric;numeric;HCSRU16a2;"Hoeveel keer een bezoek in het ziekenhuis?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.2;numeric;numeric;HCSRU16a3;"Hoeveel keer telefonisch contact?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.4;numeric;numeric;HCSRU16b1;"Lopend of met de fiets";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.5;numeric;numeric;HCSRU16b2;"Met de auto";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.6;numeric;numeric;HCSRU16b3;"Met het openbaar vervoer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.7;numeric;numeric;HCSRU16b4;"Met de taxi";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.9;string;string;HCSRU16c1;"Naam ziekenhuis";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.10;string;string;HCSRU16c2;"Plaatsnaam ziekenhuis";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.12;string;string;HCSRU16d1a;"Wat voor verpleegkundige?";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.13;numeric;numeric;HCSRU16d2a;"Hoeveel keer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.14;radio;radio;HCSRU16d3a;"Met nog een verpleegkundige contact gehad?";NeeJa;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+HCSRU;"HCSRU (7)";8;1.14.1;string;string;HCSRU16d1b;"Wat voor verpleegkundige?";;1;;;;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+HCSRU;"HCSRU (7)";8;1.14.2;numeric;numeric;HCSRU16d2b;"Hoeveel keer";;1;;;keer;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+HCSRU;"HCSRU (7)";8;1.14.3;radio;radio;HCSRU16d3b;"Met nog een verpleegkundige contact gehad?";NeeJa;1;;;keer;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+HCSRU;"HCSRU (7)";8;1.14.3.1;string;string;HCSRU16d1c;"Wat voor verpleegkundige?";;1;;;;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+HCSRU;"HCSRU (7)";8;1.14.3.2;numeric;numeric;HCSRU16d2c;"Hoeveel keer";;1;;;keer;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+HCSRU;"HCSRU (8)";9;1;radio;radio;HCSRU17a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";HCSRU13a1;1;;;;;;0;;;
+HCSRU;"HCSRU (8)";9;1.1;numeric;numeric;HCSRU17a2;"Hoeveel keer contact gehad?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+HCSRU;"HCSRU (8)";9;1.3;string;string;HCSRU17b1a;"Wat voor hulpverlener?";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+HCSRU;"HCSRU (8)";9;1.4;numeric;numeric;HCSRU17b2a;"Hoeveel keer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+HCSRU;"HCSRU (8)";9;1.5;radio;radio;HCSRU17b3a;"Met nog een andere hulpverlener contact gehad?";NeeJa;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+HCSRU;"HCSRU (8)";9;1.5.1;string;string;HCSRU17b1b;"Wat voor hulpverlener?";;1;;;;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+HCSRU;"HCSRU (8)";9;1.5.2;numeric;numeric;HCSRU17b2b;"Hoeveel keer";;1;;;keer;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+HCSRU;"HCSRU (8)";9;1.5.3;radio;radio;HCSRU17b3b;"Met nog een andere hulpverlener contact gehad?";NeeJa;1;;;keer;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+HCSRU;"HCSRU (8)";9;1.5.3.1;string;string;HCSRU17b1c;"Wat voor hulpverlener?";;1;;;;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+HCSRU;"HCSRU (8)";9;1.5.3.2;numeric;numeric;HCSRU17b2c;"Hoeveel keer";;1;;;keer;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+HCSRU;"HCSRU (8)";9;1.7;numeric;numeric;HCSRU17c1;"Lopend of met de fiets";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+HCSRU;"HCSRU (8)";9;1.8;numeric;numeric;HCSRU17c2;"Met de auto";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+HCSRU;"HCSRU (8)";9;1.9;numeric;numeric;HCSRU17c3;"Met het openbaar vervoer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+HCSRU;"HCSRU (8)";9;1.10;numeric;numeric;HCSRU17c4;"Met de taxi";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+HCSRU;"HCSRU (9)";10;1;radio;radio;HCSRU19;"Is uw kind de AFGELOPEN 3 MAANDEN opgenomen geweest in het ziekenhuis in verband met luchtwegklachten? Met een opname bedoelen we een minstens één overnachting in het ziekenhuis.";NeeJa;1;;;;;;0;;;
+HCSRU;"HCSRU (9)";10;1.2;numeric;numeric;HCSRU19_1a;"Opname 1: Aantal nachten?";;1;;;;;;0;"Is uw kind de AFGELOPEN 3 MAANDEN opgenomen geweest in het ziekenhuis in verband met luchtwegklachten? _Met een opname bedoelen we een minstens één overnachting in het ziekenhuis._";==;1
+HCSRU;"HCSRU (9)";10;1.3;string;string;HCSRU19_1b;"Opname 1: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Is uw kind de AFGELOPEN 3 MAANDEN opgenomen geweest in het ziekenhuis in verband met luchtwegklachten? _Met een opname bedoelen we een minstens één overnachting in het ziekenhuis._";==;1
+HCSRU;"HCSRU (9)";10;1.4;radio;radio;HCSRU19_1c;"Nog een opname?";NeeJa;1;;;;;;0;"Is uw kind de AFGELOPEN 3 MAANDEN opgenomen geweest in het ziekenhuis in verband met luchtwegklachten? _Met een opname bedoelen we een minstens één overnachting in het ziekenhuis._";==;1
+HCSRU;"HCSRU (9)";10;1.4.1;numeric;numeric;HCSRU19_2a;"Opname 2: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.2;string;string;HCSRU19_2b;"Opname 2: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3;radio;radio;HCSRU19_2c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.1;numeric;numeric;HCSRU19_3a;"Opname 3: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.2;string;string;HCSRU19_3b;"Opname 3: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3;radio;radio;HCSRU19_3c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.1;numeric;numeric;HCSRU19_4a;"Opname 4: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.2;string;string;HCSRU19_4b;"Opname 4: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3;radio;radio;HCSRU19_4c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.1;numeric;numeric;HCSRU19_5a;"Opname 5: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.2;string;string;HCSRU19_5b;"Opname 5: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3;radio;radio;HCSRU19_5c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.1;numeric;numeric;HCSRU19_6a;"Opname 6: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.2;string;string;HCSRU19_6b;"Opname 6: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3;radio;radio;HCSRU19_6c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.1;numeric;numeric;HCSRU19_7a;"Opname 7: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.2;string;string;HCSRU19_7b;"Opname 7: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.3;radio;radio;HCSRU19_7c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.3.1;numeric;numeric;HCSRU19_8a;"Opname 8: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.3.2;string;string;HCSRU19_8b;"Opname 8: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.3.3;radio;radio;HCSRU19_8c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.1;numeric;numeric;HCSRU19_9a;"Opname 9: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.2;string;string;HCSRU19_9b;"Opname 9: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.3;radio;radio;HCSRU19_9c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.3.1;numeric;numeric;HCSRU19_10a;"Opname 10: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.3.2;string;string;HCSRU19_10b;"Opname 10: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+HCSRU;"HCSRU (10)";11;2;radio;radio;HCSRU20;"Houdt u bij het plannen van (reguliere) afspraken voor uw kind in verband met de luchtwegklachten bij de huisarts of in het ziekenhuis over het algemeen rekening met uw eigen werk- of opleidingsagenda?";HCSRU20;1;;;;;;0;;;
+HCSRU;"HCSRU (10)";11;3;radio;radio;HCSRU21;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding.";NeeJa;1;;;;;;0;;;
+HCSRU;"HCSRU (10)";11;3.2;numeric;numeric;HCSRU21_01;"Werk: Aantal dagen verlof voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding._";==;1
+HCSRU;"HCSRU (10)";11;3.3;numeric;numeric;HCSRU21_02;"Opleiding: Aantal dagen verlof voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding._";==;1
+HCSRU;"HCSRU (10)";11;4;radio;radio;HCSRU22;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding.";NeeJa;1;;;;;;0;;;
+HCSRU;"HCSRU (10)";11;4.2;numeric;numeric;HCSRU22_01;"Werk: Aantal dagen verzuim voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding._";==;1
+HCSRU;"HCSRU (10)";11;4.3;numeric;numeric;HCSRU22_02;"Opleiding: Aantal dagen verzuim voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding._";==;1
+HCSRU;"HCSRU (10)";11;6;radio;radio;HCSRU23;"Houdt u bij het plannen van (reguliere) afspraken voor uw kind in verband met de luchtwegklachten bij de huisarts of in het ziekenhuis over het algemeen rekening met uw eigen werk- of opleidingsagenda?";HCSRU20;1;;;;;;0;"Ouder B betreft";!=;97
+HCSRU;"HCSRU (10)";11;7;radio;radio;HCSRU24;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding.";NeeJa;1;;;;;;0;"Ouder B betreft";!=;97
+HCSRU;"HCSRU (10)";11;7.2;numeric;numeric;HCSRU24_01;"Werk: Aantal dagen verlof voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding._";==;1
+HCSRU;"HCSRU (10)";11;7.3;numeric;numeric;HCSRU24_02;"Opleiding: Aantal dagen verlof voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding._";==;1
+HCSRU;"HCSRU (10)";11;8;radio;radio;HCSRU25;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding.";NeeJa;1;;;;;;0;"Ouder B betreft";!=;97
+HCSRU;"HCSRU (10)";11;8.2;numeric;numeric;HCSRU25_01;"Werk: Aantal dagen verzuim voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding._";==;1
+HCSRU;"HCSRU (10)";11;8.3;numeric;numeric;HCSRU25_02;"Opleiding: Aantal dagen verzuim voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding._";==;1
+"HCSRU (h)";"HCSRU (1)";2;1;radio;radio;r_HCSRU01;"Ouder A betreft";HCSRU01;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (1)";2;2;radio;radio;r_HCSRU02Chg;"Is de arbeidssituatie van Ouder A veranderd t.o.v. 3 maanden geleden?";NeeJa;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (1)";2;2.1;radio;radio;r_HCSRU02;"Wat is op dit moment van toepassing op Ouder A?";HCSRU02;1;;;;;;0;"Is de arbeidssituatie van Ouder A veranderd t.o.v. 3 maanden geleden?";==;1
+"HCSRU (h)";"HCSRU (1)";2;2.1.1;string;string;r_HCSRU02Oth;"Anders, namelijk";;1;;;;;;0;"Wat is op dit moment van toepassing op Ouder A?";==;98
+"HCSRU (h)";"HCSRU (1)";2;2.2;calculation;calculation;r_HCSRU02Calc;HCSRU02Calc;;0;;;;;"var check = {r_HCSRU02};if (check == 7 || check == 8) {1}else if (check == 1 || check == 2 || check == 98) {2}else {0}";1;"Is de arbeidssituatie van Ouder A veranderd t.o.v. 3 maanden geleden?";==;1
+"HCSRU (h)";"HCSRU (2)";3;1;numeric;numeric;r_HCSRU03;"Voor hoeveel uur per week is Ouder A werkzaam (in loondienst of als zelfstandig ondernemer)?";;1;;;"uren per week";;;0;HCSRU02Calc;>;0
+"HCSRU (h)";"HCSRU (2)";3;2;numeric;numeric;r_HCSRU04;"Over hoeveel dagen per week zijn deze uren verdeeld?";;1;0;7;"dagen per week";;;0;HCSRU02Calc;>;0
+"HCSRU (h)";"HCSRU (2)";3;3;string;string;r_HCSRU05;"Wat is het beroep van Ouder A?";;1;;;;;;0;HCSRU02Calc;>;1
+"HCSRU (h)";"HCSRU (2)";3;4;radio;radio;r_HCSRU06a;"Kunt u het netto inkomen uit betaald werk van Ouder A, d.w.z. na aftrek van belastingen en premies, doorgeven?";HCSRU06a;1;;;;;;0;HCSRU02Calc;>;1
+"HCSRU (h)";"HCSRU (2)";3;4.1;numeric;numeric;r_HCSRU06b;"Wat is het netto inkomen uit betaald werk van Ouder A, d.w.z. na aftrek van belastingen en premies?";;1;;;euro;;;0;"Kunt u het netto inkomen uit betaald werk van Ouder A, d.w.z. na aftrek van belastingen en premies, doorgeven?";==;1
+"HCSRU (h)";"HCSRU (2)";3;4.2;radio;radio;r_HCSRU06c;"Het netto inkomen uit betaald werk van Ouder A is uitgedrukt in";HCSRU06c;1;;;;;;0;"Kunt u het netto inkomen uit betaald werk van Ouder A, d.w.z. na aftrek van belastingen en premies, doorgeven?";==;1
+"HCSRU (h)";"HCSRU (2)";3;5;radio;radio;r_HCSRU07;"Ouder B betreft";HCSRU07;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (2)";3;5.1;radio;radio;r_HCSRU08Chg;"Is de arbeidssituatie van Ouder B veranderd t.o.v. 3 maanden geleden?";NeeJa;1;;;;;;0;"Ouder B betreft";!=;97
+"HCSRU (h)";"HCSRU (2)";3;5.1.1;radio;radio;r_HCSRU08;"Wat is op dit moment van toepassing op Ouder B?";HCSRU02;1;;;;;;0;"Is de arbeidssituatie van Ouder B veranderd t.o.v. 3 maanden geleden?";==;1
+"HCSRU (h)";"HCSRU (2)";3;5.1.1.1;string;string;r_HCSRU08Oth;"Anders, namelijk";;1;;;;;;0;"Wat is op dit moment van toepassing op Ouder B?";==;98
+"HCSRU (h)";"HCSRU (2)";3;5.1.2;calculation;calculation;r_HCSRU08Calc;HCSRU02Calc;;0;;;;;"var check = {r_HCSRU08};if (check == 7 || check == 8) {1}else if (check == 1 || check == 2 || check == 98) {2}else {0}";1;"Is de arbeidssituatie van Ouder B veranderd t.o.v. 3 maanden geleden?";==;1
+"HCSRU (h)";"HCSRU (3)";4;1;numeric;numeric;r_HCSRU09;"Voor hoeveel uur per week is Ouder B werkzaam (in loondienst of als zelfstandig ondernemer)?";;1;;;"uren per week";;;0;HCSRU02Calc;>;0
+"HCSRU (h)";"HCSRU (3)";4;2;numeric;numeric;r_HCSRU10;"Over hoeveel dagen per week zijn deze uren verdeeld?";;1;0;7;"dagen per week";;;0;HCSRU02Calc;>;0
+"HCSRU (h)";"HCSRU (3)";4;3;string;string;r_HCSRU11;"Wat is het beroep van Ouder B?";;1;;;;;;0;HCSRU02Calc;>;1
+"HCSRU (h)";"HCSRU (3)";4;4;radio;radio;r_HCSRU12a;"Kunt u het netto inkomen uit betaald werk van Ouder B, d.w.z. na aftrek van belastingen en premies, doorgeven?";HCSRU06a;1;;;;;;0;HCSRU02Calc;>;1
+"HCSRU (h)";"HCSRU (3)";4;4.1;numeric;numeric;r_HCSRU12b;"Wat is het netto inkomen uit betaald werk van Ouder B, d.w.z. na aftrek van belastingen en premies?";;1;;;euro;;;0;"Kunt u het netto inkomen uit betaald werk van Ouder B, d.w.z. na aftrek van belastingen en premies, doorgeven?";==;1
+"HCSRU (h)";"HCSRU (3)";4;4.2;radio;radio;r_HCSRU12c;"Het netto inkomen uit betaald werk van Ouder B is uitgedrukt in";HCSRU06c;1;;;;;;0;"Kunt u het netto inkomen uit betaald werk van Ouder B, d.w.z. na aftrek van belastingen en premies, doorgeven?";==;1
+"HCSRU (h)";"HCSRU (4)";5;1;radio;radio;r_HCSRUWho;"Wie vult deze vragenlijst in";HCSRU01;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (4)";5;2;radio;radio;r_HCSRU13a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";HCSRU13a1;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (4)";5;2.1;numeric;numeric;r_HCSRU13a2;"Hoeveel keer contact met de huisarts?";;1;1;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (4)";5;2.3;numeric;numeric;r_HCSRU13b1;"Een bezoek heeft gebracht aan de huisarts";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (4)";5;2.4;numeric;numeric;r_HCSRU13b2;"Aan huis bent bezocht door de huisarts";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (4)";5;2.5;numeric;numeric;r_HCSRU13b3;"Een telefonisch consult heeft gehad met de huisarts";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (4)";5;2.6;numeric;numeric;r_HCSRU13b4;"Een herhaalrecept heeft verkregen bij de doktersassistent";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (4)";5;2.7;numeric;numeric;r_HCSRU13b5;"Een bezoek heeft gebracht aan de huisartsenpost";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met de huisarts(assistent) in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (4)";5;2.3.2;numeric;numeric;r_HCSRU13c1;"Lopend of met de fiets";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisarts";>=;1
+"HCSRU (h)";"HCSRU (4)";5;2.3.3;numeric;numeric;r_HCSRU13c2;"Met de auto";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisarts";>=;1
+"HCSRU (h)";"HCSRU (4)";5;2.3.4;numeric;numeric;r_HCSRU13c3;"Met het openbaar vervoer";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisarts";>=;1
+"HCSRU (h)";"HCSRU (4)";5;2.3.5;numeric;numeric;r_HCSRU13c4;"Met de taxi";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisarts";>=;1
+"HCSRU (h)";"HCSRU (4)";5;2.7.2;numeric;numeric;r_HCSRU13d1;"Lopend of met de fiets";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisartsenpost";>=;1
+"HCSRU (h)";"HCSRU (4)";5;2.7.3;numeric;numeric;r_HCSRU13d2;"Met de auto";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisartsenpost";>=;1
+"HCSRU (h)";"HCSRU (4)";5;2.7.4;numeric;numeric;r_HCSRU13d3;"Met het openbaar vervoer";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisartsenpost";>=;1
+"HCSRU (h)";"HCSRU (4)";5;2.7.5;numeric;numeric;r_HCSRU13d4;"Met de taxi";;1;;;keer;;;0;"Een bezoek heeft gebracht aan de huisartsenpost";>=;1
+"HCSRU (h)";"HCSRU (5)";6;1;radio;radio;r_HCSRU14a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";HCSRU13a1;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (5)";6;1.1;numeric;numeric;r_HCSRU14a2;"Hoeveel keer een bezoek aan de spoedeisende hulp?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (5)";6;1.3;numeric;numeric;r_HCSRU14b1;"Lopend of met de fiets";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (5)";6;1.4;numeric;numeric;r_HCSRU14b2;"Met de auto";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (5)";6;1.5;numeric;numeric;r_HCSRU14b3;"Met het openbaar vervoer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (5)";6;1.6;numeric;numeric;r_HCSRU14b4;"Met de taxi";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (5)";6;1.7;numeric;numeric;r_HCSRU14b5;"Met de ambulance";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact de spoedeisende hulp in het ziekenhuis bezocht in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1;radio;radio;r_HCSRU15a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";HCSRU13a1;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (6)";7;1.1;numeric;numeric;r_HCSRU15a2;"Hoeveel keer een bezoek in het ziekenhuis?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.2;numeric;numeric;r_HCSRU15a3;"Hoeveel keer telefonisch contact?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.4;numeric;numeric;r_HCSRU15b1;"Lopend of met de fiets";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.5;numeric;numeric;r_HCSRU15b2;"Met de auto";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.6;numeric;numeric;r_HCSRU15b3;"Met het openbaar vervoer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.7;numeric;numeric;r_HCSRU15b4;"Met de taxi";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.9;string;string;r_HCSRU15c1;"Naam ziekenhuis";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.10;string;string;r_HCSRU15c2;"Plaatsnaam ziekenhuis";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.12;string;string;r_HCSRU15d1a;"Wat voor medisch specialist";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.13;numeric;numeric;r_HCSRU15d2a;"Hoeveel keer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.14;radio;radio;r_HCSRU15d3a;"Met nog een medisch specialist contact gehad?";NeeJa;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met een medisch specialist in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.14.1;string;string;r_HCSRU15d1b;"Wat voor medisch specialist";;1;;;;;;0;"Met nog een medisch specialist contact gehad?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.14.2;numeric;numeric;r_HCSRU15d2b;"Hoeveel keer";;1;;;keer;;;0;"Met nog een medisch specialist contact gehad?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.14.3;radio;radio;r_HCSRU15d3b;"Met nog een medisch specialist contact gehad?";NeeJa;1;;;keer;;;0;"Met nog een medisch specialist contact gehad?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.14.3.1;string;string;r_HCSRU15d1c;"Wat voor medisch specialist";;1;;;;;;0;"Met nog een medisch specialist contact gehad?";==;1
+"HCSRU (h)";"HCSRU (6)";7;1.14.3.2;numeric;numeric;r_HCSRU15d2c;"Hoeveel keer";;1;;;keer;;;0;"Met nog een medisch specialist contact gehad?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1;radio;radio;r_HCSRU16a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";HCSRU13a1;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (7)";8;1.1;numeric;numeric;r_HCSRU16a2;"Hoeveel keer een bezoek in het ziekenhuis?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.2;numeric;numeric;r_HCSRU16a3;"Hoeveel keer telefonisch contact?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.4;numeric;numeric;r_HCSRU16b1;"Lopend of met de fiets";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.5;numeric;numeric;r_HCSRU16b2;"Met de auto";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.6;numeric;numeric;r_HCSRU16b3;"Met het openbaar vervoer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.7;numeric;numeric;r_HCSRU16b4;"Met de taxi";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.9;string;string;r_HCSRU16c1;"Naam ziekenhuis";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.10;string;string;r_HCSRU16c2;"Plaatsnaam ziekenhuis";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.12;string;string;r_HCSRU16d1a;"Wat voor verpleegkundige?";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.13;numeric;numeric;r_HCSRU16d2a;"Hoeveel keer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.14;radio;radio;r_HCSRU16d3a;"Met nog een verpleegkundige contact gehad?";NeeJa;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met één of meer verpleegkundigen in verband met de luchtwegklachten van uw kind?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.14.1;string;string;r_HCSRU16d1b;"Wat voor verpleegkundige?";;1;;;;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.14.2;numeric;numeric;r_HCSRU16d2b;"Hoeveel keer";;1;;;keer;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.14.3;radio;radio;r_HCSRU16d3b;"Met nog een verpleegkundige contact gehad?";NeeJa;1;;;keer;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.14.3.1;string;string;r_HCSRU16d1c;"Wat voor verpleegkundige?";;1;;;;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+"HCSRU (h)";"HCSRU (7)";8;1.14.3.2;numeric;numeric;r_HCSRU16d2c;"Hoeveel keer";;1;;;keer;;;0;"Met nog een verpleegkundige contact gehad?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1;radio;radio;r_HCSRU17a1;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";HCSRU13a1;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (8)";9;1.1;numeric;numeric;r_HCSRU17a2;"Hoeveel keer contact gehad?";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.3;string;string;r_HCSRU17b1a;"Wat voor hulpverlener?";;1;;;;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.4;numeric;numeric;r_HCSRU17b2a;"Hoeveel keer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.5;radio;radio;r_HCSRU17b3a;"Met nog een andere hulpverlener contact gehad?";NeeJa;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.5.1;string;string;r_HCSRU17b1b;"Wat voor hulpverlener?";;1;;;;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.5.2;numeric;numeric;r_HCSRU17b2b;"Hoeveel keer";;1;;;keer;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.5.3;radio;radio;r_HCSRU17b3b;"Met nog een andere hulpverlener contact gehad?";NeeJa;1;;;keer;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.5.3.1;string;string;r_HCSRU17b1c;"Wat voor hulpverlener?";;1;;;;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.5.3.2;numeric;numeric;r_HCSRU17b2c;"Hoeveel keer";;1;;;keer;;;0;"Met nog een andere hulpverlener contact gehad?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.7;numeric;numeric;r_HCSRU17c1;"Lopend of met de fiets";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.8;numeric;numeric;r_HCSRU17c2;"Met de auto";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.9;numeric;numeric;r_HCSRU17c3;"Met het openbaar vervoer";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+"HCSRU (h)";"HCSRU (8)";9;1.10;numeric;numeric;r_HCSRU17c4;"Met de taxi";;1;;;keer;;;0;"Heeft u de AFGELOPEN DRIE MAANDEN contact gehad met andere hulpverleners in verband met de luchtwegklachten van uw kind? (zoals een psycholoog, diëtist of fysiotherapeut)?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1;radio;radio;r_HCSRU19;"Is uw kind de AFGELOPEN 3 MAANDEN opgenomen geweest in het ziekenhuis in verband met luchtwegklachten? Met een opname bedoelen we een minstens één overnachting in het ziekenhuis.";NeeJa;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (9)";10;1.2;numeric;numeric;r_HCSRU19_1a;"Opname 1: Aantal nachten?";;1;;;;;;0;"Is uw kind de AFGELOPEN 3 MAANDEN opgenomen geweest in het ziekenhuis in verband met luchtwegklachten? _Met een opname bedoelen we een minstens één overnachting in het ziekenhuis._";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.3;string;string;r_HCSRU19_1b;"Opname 1: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Is uw kind de AFGELOPEN 3 MAANDEN opgenomen geweest in het ziekenhuis in verband met luchtwegklachten? _Met een opname bedoelen we een minstens één overnachting in het ziekenhuis._";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4;radio;radio;r_HCSRU19_1c;"Nog een opname?";NeeJa;1;;;;;;0;"Is uw kind de AFGELOPEN 3 MAANDEN opgenomen geweest in het ziekenhuis in verband met luchtwegklachten? _Met een opname bedoelen we een minstens één overnachting in het ziekenhuis._";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.1;numeric;numeric;r_HCSRU19_2a;"Opname 2: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.2;string;string;r_HCSRU19_2b;"Opname 2: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3;radio;radio;r_HCSRU19_2c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.1;numeric;numeric;r_HCSRU19_3a;"Opname 3: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.2;string;string;r_HCSRU19_3b;"Opname 3: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3;radio;radio;r_HCSRU19_3c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.1;numeric;numeric;r_HCSRU19_4a;"Opname 4: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.2;string;string;r_HCSRU19_4b;"Opname 4: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3;radio;radio;r_HCSRU19_4c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.1;numeric;numeric;r_HCSRU19_5a;"Opname 5: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.2;string;string;r_HCSRU19_5b;"Opname 5: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3;radio;radio;r_HCSRU19_5c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.1;numeric;numeric;r_HCSRU19_6a;"Opname 6: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.2;string;string;r_HCSRU19_6b;"Opname 6: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3;radio;radio;r_HCSRU19_6c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.1;numeric;numeric;r_HCSRU19_7a;"Opname 7: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.2;string;string;r_HCSRU19_7b;"Opname 7: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.3;radio;radio;r_HCSRU19_7c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.3.1;numeric;numeric;r_HCSRU19_8a;"Opname 8: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.3.2;string;string;r_HCSRU19_8b;"Opname 8: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.3.3;radio;radio;r_HCSRU19_8c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.1;numeric;numeric;r_HCSRU19_9a;"Opname 9: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.2;string;string;r_HCSRU19_9b;"Opname 9: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.3;radio;radio;r_HCSRU19_9c;"Nog een opname?";NeeJa;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.3.1;numeric;numeric;r_HCSRU19_10a;"Opname 10: Aantal nachten?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (9)";10;1.4.3.3.3.3.3.3.3.3.2;string;string;r_HCSRU19_10b;"Opname 10: Waarvoor was uw kind opgenomen?";;1;;;;;;0;"Nog een opname?";==;1
+"HCSRU (h)";"HCSRU (10)";11;2;radio;radio;r_HCSRU20;"Houdt u bij het plannen van (reguliere) afspraken voor uw kind in verband met de luchtwegklachten bij de huisarts of in het ziekenhuis over het algemeen rekening met uw eigen werk- of opleidingsagenda?";HCSRU20;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (10)";11;3;radio;radio;r_HCSRU21;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding.";NeeJa;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (10)";11;3.2;numeric;numeric;r_HCSRU21_01;"Werk: Aantal dagen verlof voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding._";==;1
+"HCSRU (h)";"HCSRU (10)";11;3.3;numeric;numeric;r_HCSRU21_02;"Opleiding: Aantal dagen verlof voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding._";==;1
+"HCSRU (h)";"HCSRU (10)";11;4;radio;radio;r_HCSRU22;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding.";NeeJa;1;;;;;;0;;;
+"HCSRU (h)";"HCSRU (10)";11;4.2;numeric;numeric;r_HCSRU22_01;"Werk: Aantal dagen verzuim voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding._";==;1
+"HCSRU (h)";"HCSRU (10)";11;4.3;numeric;numeric;r_HCSRU22_02;"Opleiding: Aantal dagen verzuim voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding._";==;1
+"HCSRU (h)";"HCSRU (10)";11;6;radio;radio;r_HCSRU23;"Houdt u bij het plannen van (reguliere) afspraken voor uw kind in verband met de luchtwegklachten bij de huisarts of in het ziekenhuis over het algemeen rekening met uw eigen werk- of opleidingsagenda?";HCSRU20;1;;;;;;0;"Ouder B betreft";!=;97
+"HCSRU (h)";"HCSRU (10)";11;7;radio;radio;r_HCSRU24;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding.";NeeJa;1;;;;;;0;"Ouder B betreft";!=;97
+"HCSRU (h)";"HCSRU (10)";11;7.2;numeric;numeric;r_HCSRU24_01;"Werk: Aantal dagen verlof voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding._";==;1
+"HCSRU (h)";"HCSRU (10)";11;7.3;numeric;numeric;r_HCSRU24_02;"Opleiding: Aantal dagen verlof voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verlof opgenomen in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verlof bedoelen we vrije dagen opnemen van het werk of opleiding._";==;1
+"HCSRU (h)";"HCSRU (10)";11;8;radio;radio;r_HCSRU25;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding.";NeeJa;1;;;;;;0;"Ouder B betreft";!=;97
+"HCSRU (h)";"HCSRU (10)";11;8.2;numeric;numeric;r_HCSRU25_01;"Werk: Aantal dagen verzuim voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding._";==;1
+"HCSRU (h)";"HCSRU (10)";11;8.3;numeric;numeric;r_HCSRU25_02;"Opleiding: Aantal dagen verzuim voor gezondheidsklachten van uw kind?";;1;;;dagen;;;0;"Heeft u in de AFGELOPEN 3 MAANDEN verzuimd in verband met luchtweg gerelateerde gezondheidsklachten of ziekenhuis/arts bezoeken van uw kind. _Met verzuimen bedoelen we een ziekmelding bij de werknemer of opleiding._";==;1
+ISAAC;"ISAAC (1)";2;1;radio;radio;ISAACa01;"Heeft uw kind in het verleden ooit last gehad van piepen op de borst?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (1)";2;2;radio;radio;ISAACa02;"Heeft uw kind de AFGELOPEN 12 MAANDEN last gehad van piepen op de borst?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (1)";2;3;radio;radio;ISAACa03;"Hoeveel aanvallen van piepen op de borst heeft uw kind in de AFGELOPEN 12 MAANDEN gehad?";ISAACa03;1;;;;;;0;;;
+ISAAC;"ISAAC (1)";2;4;radio;radio;ISAACa04;"Hoe vaak is uw kind gemiddeld wakker geworden door piepen op de borst in de AFGELOPEN 12 MAANDEN?";ISAACa04;1;;;;;;0;;;
+ISAAC;"ISAAC (1)";2;5;radio;radio;ISAACa05;"Was het piepen in de AFGELOPEN 12 MAANDEN ooit zo erg dat uw kind steeds na een of twee woorden moest ademhalen?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (1)";2;6;radio;radio;ISAACa06;"Heeft uw kind ooit astma gehad?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (1)";2;7;radio;radio;ISAACa07;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van piepen op de borst na inspanning?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (1)";2;8;radio;radio;ISAACa08;"Heeft uw kind in de AFGELOPEN 12 MAANDEN ’s nachts last gehad van een droge hoest zonder dat het verkouden was of een infectie van de longen of luchtwegen had?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (2)";3;1;radio;radio;ISAACb01;"Heeft uw kind ooit last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (2)";3;1.1;radio;radio;ISAACb02;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";ISAACa01;1;;;;;;0;"Heeft uw kind ooit last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.1;radio;radio;ISAACb03;"Gingen deze klachten in de AFGELOPEN 12 MAANDEN gepaard met jeukende en/of tranende ogen?";ISAACa01;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#Januari;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#Februari;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#Maart;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#April;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#Mei;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#Juni;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#Juli;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#Augustus;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#September;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#Oktober;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#November;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.2;checkbox;checkbox;ISAACb04#December;"In welke van de AFGELOPEN 12 MAANDEN kwamen de neusklachten voor? (Vink alle maanden aan die van toepassing zijn)";ISAACb04;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;1.1.3;radio;radio;ISAACb05;"In hoeverre waren de neusklachten een belemmering voor de dagelijkse activiteiten van uw kind in de AFGELOPEN 12 MAANDEN?";ISAACb05;1;;;;;;0;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van niezen, een loopneus of een verstopte neus, terwijl hij/zij NIET verkouden was en geen griep had?";==;1
+ISAAC;"ISAAC (2)";3;2;radio;radio;ISAACb06;"Heeft uw kind ooit hooikoorts gehad?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (3)";4;1;radio;radio;ISAACc01;"Heeft uw kind ooit een jeukende huiduitslag gehad die wisselend aanwezig was gedurende tenminste 6 maanden?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (3)";4;1.1;radio;radio;ISAACc02;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";ISAACa01;1;;;;;;0;"Heeft uw kind ooit een jeukende huiduitslag gehad die wisselend aanwezig was gedurende tenminste 6 maanden?";==;1
+ISAAC;"ISAAC (3)";4;1.1.1;checkbox;checkbox;"ISAACc03#Binnenkant van de ellebogen";"Was deze jeukende huiduitslag ooit aanwezig op een van de volgende plaatsen?";ISAACc03;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;1.1.1;checkbox;checkbox;ISAACc03#Knieholtes;"Was deze jeukende huiduitslag ooit aanwezig op een van de volgende plaatsen?";ISAACc03;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;1.1.1;checkbox;checkbox;"ISAACc03#Voorkant van de enkels";"Was deze jeukende huiduitslag ooit aanwezig op een van de volgende plaatsen?";ISAACc03;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;1.1.1;checkbox;checkbox;"ISAACc03#Onder de billen";"Was deze jeukende huiduitslag ooit aanwezig op een van de volgende plaatsen?";ISAACc03;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;1.1.1;checkbox;checkbox;"ISAACc03#In de hals";"Was deze jeukende huiduitslag ooit aanwezig op een van de volgende plaatsen?";ISAACc03;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;1.1.1;checkbox;checkbox;"ISAACc03#Rond de ogen of oren";"Was deze jeukende huiduitslag ooit aanwezig op een van de volgende plaatsen?";ISAACc03;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;1.1.1;checkbox;checkbox;"ISAACc03#Nee, op geen van deze plaatsen";"Was deze jeukende huiduitslag ooit aanwezig op een van de volgende plaatsen?";ISAACc03;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;1.1.2;radio;radio;ISAACc04;"Op welke leeftijd kwam deze jeukende huiduitslag voor het eerst voor?";ISAACc04;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;1.1.3;radio;radio;ISAACc05;"Is deze uitslag ooit helemaal weg geweest in de AFGELOPEN 12 MAANDEN?";ISAACa01;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;1.1.4;radio;radio;ISAACc06;"Hoe vaak (gemiddeld) in de AFGELOPEN 12 MAANDEN was uw kind ´s nachts wakker door deze jeukende huiduitslag?";ISAACa04;1;;;;;;0;"Heeft uw kind ooit last gehad van deze jeukende huiduitslag in de AFGELOPEN 12 MAANDEN?";==;1
+ISAAC;"ISAAC (3)";4;2;radio;radio;ISAACc07;"Heeft uw kind ooit eczeem gehad?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;1;radio;radio;ISAACd01;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van vastzittend slijm of slijm opgehoest tijdens verkoudheid?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;2;radio;radio;ISAACd02;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van vastzittend slijm of slijm opgehoest terwijl hij/zij niet verkouden was?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;3;calculation;calculation;ISAACd0102Calc;ISAACd0102Calc;;0;;;;;"var check1 = {ISAACd01};var check2 = {ISAACd02};if (check1 < 1 && check2 < 1) {1}else {0}";1;;;
+ISAAC;"ISAAC (4)";5;3.1;radio;radio;ISAACd03;"Heeft uw kind last van vastzittend slijm of hoest uw kind slijm op, op minstens 4 dagen per week en minstens 3 maanden per jaar?";ISAACa01;1;;;;;;0;ISAACd0102Calc;!=;1
+ISAAC;"ISAAC (4)";5;3.2;numeric;numeric;ISAACd04;"Hoeveel jaar heeft uw kind in deze mate last gehad?";;1;;;jaar;;;0;ISAACd0102Calc;!=;1
+ISAAC;"ISAAC (4)";5;4;radio;radio;ISAACd05;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van piepen op de borst tijdens of na inspanning?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;5;radio;radio;ISAACd06;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van piepen op de borst zonder dat uw kind zich tevoren ingespannen had?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;6;radio;radio;ISAACd07;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van piepen op de borst tijdens een verkoudheid of griep?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;7;radio;radio;ISAACd08;"Heeft uw kind in de AFGELOPEN 12 MAANDEN last gehad van piepen op de borst zonder dat hij/zij een verkoudheid of griep had?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;8;radio;radio;ISAACd09;"Is uw kind ooit in zijn of haar leven wakker geworden vanwege kortademigheid?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;9;radio;radio;ISAACd10;"Is uw kind ooit in zijn of haar leven wakker geworden vanwege benauwdheid?";ISAACa01;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;"ISAACd11#Het weer";"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;ISAACd11#Stuifmeel;"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;ISAACd11#Emoties;"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;ISAACd11#Stof;"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;ISAACd11#Huisdieren;"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;"ISAACd11#Wollen kleding";"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;"ISAACd11#Verkoudheid of griep";"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;ISAACd11#Tabaksrook;"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;"ISAACd11#Eten en drinken";"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;ISAACd11#Zeep/waspoeder/spuitbussen;"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;ISAACd11#Anders;"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10;checkbox;checkbox;"ISAACd11#Geen van bovenstaande antwoorden";"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";ISAACd11;1;;;;;;0;;;
+ISAAC;"ISAAC (4)";5;10.1;string;string;ISAACd11Oth;"Indien anders, namelijk";;1;;;;;;0;"Door welke oorzaken is in de AFGELOPEN 12 MAANDEN het piepen op de borst bij uw kind erger geworden? (U kunt meerdere antwoorden aanvinken)";==;98
+TAPQOL;"TAPQOL (1)";2;1;radio;radio;TAPQOL01a;"Maag- of buikpijn?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (1)";2;1.1;radio;radio;TAPQOL01b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Maag- of buikpijn?";!=;0
+TAPQOL;"TAPQOL (1)";2;2;radio;radio;TAPQOL02a;Krampjes?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (1)";2;2.1;radio;radio;TAPQOL02b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;Krampjes?;!=;0
+TAPQOL;"TAPQOL (1)";2;3;radio;radio;TAPQOL03a;Eczeem?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (1)";2;3.1;radio;radio;TAPQOL03b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;Eczeem?;!=;0
+TAPQOL;"TAPQOL (1)";2;4;radio;radio;TAPQOL04a;Jeuk?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (1)";2;4.1;radio;radio;TAPQOL04b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;Jeuk?;!=;0
+TAPQOL;"TAPQOL (1)";2;5;radio;radio;TAPQOL05a;"Droge huid?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (1)";2;5.1;radio;radio;TAPQOL05b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Droge huid?";!=;0
+TAPQOL;"TAPQOL (1)";2;6;radio;radio;TAPQOL06a;Bronchitis?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (1)";2;6.1;radio;radio;TAPQOL06b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;Bronchitis?;!=;0
+TAPQOL;"TAPQOL (1)";2;7;radio;radio;TAPQOL07a;"Moeite met de ademhaling of longproblemen?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (1)";2;7.1;radio;radio;TAPQOL07b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Moeite met de ademhaling of longproblemen?";!=;0
+TAPQOL;"TAPQOL (2)";3;1;radio;radio;TAPQOL08a;Benauwd?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (2)";3;1.1;radio;radio;TAPQOL08b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;Benauwd?;!=;0
+TAPQOL;"TAPQOL (2)";3;2;radio;radio;TAPQOL09a;Misselijk?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (2)";3;2.1;radio;radio;TAPQOL09b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;Misselijk?;!=;0
+TAPQOL;"TAPQOL (3)";4;1;radio;radio;TAPQOL10a;"Sliep uw kind onrustig?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (3)";4;1.1;radio;radio;TAPQOL10b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Sliep uw kind onrustig?";!=;0
+TAPQOL;"TAPQOL (3)";4;2;radio;radio;TAPQOL11a;"Lag uw kind ‘s nachts wakker?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (3)";4;2.1;radio;radio;TAPQOL11b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Lag uw kind ‘s nachts wakker?";!=;0
+TAPQOL;"TAPQOL (3)";4;3;radio;radio;TAPQOL12a;"Huilde uw kind ‘s nachts?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (3)";4;3.1;radio;radio;TAPQOL12b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Huilde uw kind ‘s nachts?";!=;0
+TAPQOL;"TAPQOL (3)";4;4;radio;radio;TAPQOL13a;"Had uw kind moeite om de hele nacht door te slapen?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (3)";4;4.1;radio;radio;TAPQOL13b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Had uw kind moeite om de hele nacht door te slapen?";!=;0
+TAPQOL;"TAPQOL (4)";5;1;radio;radio;TAPQOL14a;"Had uw kind een slechte eetlust?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (4)";5;1.1;radio;radio;TAPQOL14b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Had uw kind een slechte eetlust?";!=;0
+TAPQOL;"TAPQOL (4)";5;2;radio;radio;TAPQOL15a;"Had uw kind moeite om voldoende te eten?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (4)";5;2.1;radio;radio;TAPQOL15b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Had uw kind moeite om voldoende te eten?";!=;0
+TAPQOL;"TAPQOL (4)";5;3;radio;radio;TAPQOL16a;"Weigerde uw kind te eten?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (4)";5;3.1;radio;radio;TAPQOL16b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Weigerde uw kind te eten?";!=;0
+TAPQOL;"TAPQOL (5)";6;1;radio;radio;TAPQOL17;"Mijn kind was driftig";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (5)";6;2;radio;radio;TAPQOL18;"Mijn kind was agressief";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (5)";6;3;radio;radio;TAPQOL19;"Mijn kind was geprikkeld, geïrriteerd";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (5)";6;4;radio;radio;TAPQOL20;"Mijn kind was boos";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (5)";6;5;radio;radio;TAPQOL21;"Mijn kind was onrustig of ongeduldig tegen mij";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (5)";6;6;radio;radio;TAPQOL22;"Mijn kind was opstandig/dwars tegen mij";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (5)";6;7;radio;radio;TAPQOL23;"Mijn kind was voor mij onhandelbaar";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (6)";7;1;radio;radio;TAPQOL24;Opgewekt?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (6)";7;2;radio;radio;TAPQOL25;Blij?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (6)";7;3;radio;radio;TAPQOL26;Gelukkig?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (6)";7;4;radio;radio;TAPQOL27;Bang?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (6)";7;5;radio;radio;TAPQOL28;Gespannen?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (6)";7;6;radio;radio;TAPQOL29;Angstig?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (6)";7;7;radio;radio;TAPQOL30;Energiek?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (6)";7;8;radio;radio;TAPQOL31;Actief?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (6)";7;9;radio;radio;TAPQOL32;Levendig?;TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (7)";8;1;radio;radio;TAPQOL33;"Mijn kind kon met andere kinderen prettig spelen";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (7)";8;2;radio;radio;TAPQOL34;"Mijn kind was bij andere kinderen op zijn/haar gemak";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (7)";8;3;radio;radio;TAPQOL35;"Mijn kind was zeker van zichzelf bij andere kinderen";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (8)";9;1;radio;radio;TAPQOL36a;"Moeite met lopen?";TAPQOL36a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (8)";9;1.1;radio;radio;TAPQOL36b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Moeite met lopen?";!=;0
+TAPQOL;"TAPQOL (8)";9;2;radio;radio;TAPQOL37a;"Moeite met rennen/hollen?";TAPQOL37a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (8)";9;2.1;radio;radio;TAPQOL37b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Moeite met rennen/hollen?";!=;0
+TAPQOL;"TAPQOL (8)";9;3;radio;radio;TAPQOL38a;"Moeite om zonder hulp de trap op te lopen?";TAPQOL36a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (8)";9;3.1;radio;radio;TAPQOL38b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Moeite om zonder hulp de trap op te lopen?";!=;0
+TAPQOL;"TAPQOL (8)";9;4;radio;radio;TAPQOL39a;"Moeite met het bewaren van het evenwicht?";TAPQOL39a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (8)";9;4.1;radio;radio;TAPQOL39b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Moeite met het bewaren van het evenwicht?";!=;0
+TAPQOL;"TAPQOL (8)";9;5;radio;radio;TAPQOL40a;"Moeite om te begrijpen wat anderen zeiden?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (8)";9;5.1;radio;radio;TAPQOL40b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Moeite om te begrijpen wat anderen zeiden?";!=;0
+TAPQOL;"TAPQOL (8)";9;6;radio;radio;TAPQOL41a;"Moeite om duidelijk te praten?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (8)";9;6.1;radio;radio;TAPQOL41b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Moeite om duidelijk te praten?";!=;0
+TAPQOL;"TAPQOL (8)";9;7;radio;radio;TAPQOL42a;"Moeite om uit zijn/haar woorden te komen?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (8)";9;7.1;radio;radio;TAPQOL42b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Moeite om uit zijn/haar woorden te komen?";!=;0
+TAPQOL;"TAPQOL (8)";9;8;radio;radio;TAPQOL43a;"Moeite om duidelijk te maken wat het wil?";TAPQOL01a;1;;;;;;0;;;
+TAPQOL;"TAPQOL (8)";9;8.1;radio;radio;TAPQOL43b;"Mijn kind voelde zich daarbij";TAPQOL01b;1;;;;;;0;"Moeite om duidelijk te maken wat het wil?";!=;0
+TRACK;"TRACK (1)";2;1;radio;radio;TRACK1;"Gedurende de afgelopen 4 weken, hoe vaak had uw kind last van ademhalingsproblemen, zoals piepende ademhaling, hoesten of kortademigheid?";TRACK1;1;;;;;;0;;;
+TRACK;"TRACK (1)";2;2;radio;radio;TRACK2;"Gedurende de afgelopen 4 weken, hoe vaak werd uw kind gedurende de nacht wakker door zijn/haar ademhalingsproblemen (zoals piepende ademhaling, hoesten, kortademigheid)?";TRACK1;1;;;;;;0;;;
+TRACK;"TRACK (1)";2;3;radio;radio;TRACK3;"Gedurende de afgelopen 4 weken, hoe vaak hadden de ademhalingsproblemen van uw kind (zoals piepende ademhaling, hoesten of kortademigheid) invloed op zijn/haar mogelijkheden om te spelen, naar school te gaan, of de voor zijn/haar leeftijd gebruikelijke activiteiten te ondernemen?";TRACK3;1;;;;;;0;;;
+TRACK;"TRACK (1)";2;4;radio;radio;TRACK4;"In de afgelopen 3 maanden, hoe vaak moest u de ademhalingsproblemen van uw kind (zoals piepende ademhaling, hoesten, kortademigheid) met kortwerkend luchtwegverwijdend middel (Albuterol, Ventolin, Proventil, Maxair, proAIR, Xopenex of Primatene Mist) behandelen?";TRACK1;1;;;;;;0;;;
+TRACK;"TRACK (1)";2;5;radio;radio;TRACK5;"In de afgelopen 12 maanden, hoe vaak heeft uw kind orale corticosteroïden (prednison, prednisolon, Orapred, Prelone, Decadron)  gekregen omdat de ademhalingsproblemen niet onder controle kwamen door andere medicatie?";TRACK5;1;;;;;;0;;;
