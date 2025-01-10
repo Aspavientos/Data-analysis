@@ -6,9 +6,12 @@
 
 # Packages ----
 require(rstudioapi)
+require(ggplot2)
 require(stringr)
 require(dplyr)
 require(datetime)
+require(nlme)
+require(lme4)
 
 # Load data ----
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -74,8 +77,12 @@ rm(rm_col, datecols, repcols, maxmin, i, j)
 # Add total TRACK score
 surveys$TRACK$TRACKSUM = rowSums(surveys$TRACK %>% select(c(TRACK1:TRACK5)))
 
+surveys$TRACK$TRACKTHRESH = surveys$TRACK$TRACKSUM >= 80
+surveys$TRACK$TRACKTHRESH = as.factor(surveys$TRACK$TRACKTHRESH)
+levels(surveys$TRACK$TRACKTHRESH) = c("NotWellControlled", "WellControlled")
+
 # Merge data frames of surveys
-TRACK_sub = surveys$TRACK[,c(1, 3, 6, 8, 14)]
+TRACK_sub = surveys$TRACK[,c(1, 3, 6, 8, 14, 15)]
 ADEM2_sub = surveys$ADEM2_export %>% select(Participant.Id, V1_Rand_RandGroup, V1_Rand_BreathResult)
 
 TRACK_merge = merge(ADEM2_sub, TRACK_sub, by.x = "Participant.Id", by.y = "Castor.Participant.ID")
@@ -88,9 +95,11 @@ levels(ADEM2_sub$V1_Rand_RandGroup) = c("UsualCare", "Intervention")
 
 TRACK_merge$V1_Rand_BreathResult = as.factor(TRACK_merge$V1_Rand_BreathResult)
 levels(TRACK_merge$V1_Rand_BreathResult) = c("Asthma", "TransWheeze", "UsualCare")
+TRACK_merge$V1_Rand_BreathResult = relevel(TRACK_merge$V1_Rand_BreathResult, "UsualCare")
 
 ADEM2_sub$V1_Rand_BreathResult = as.factor(ADEM2_sub$V1_Rand_BreathResult)
 levels(ADEM2_sub$V1_Rand_BreathResult) = c("Asthma", "TransWheeze", "UsualCare")
+ADEM2_sub$V1_Rand_BreathResult = relevel(ADEM2_sub$V1_Rand_BreathResult, "UsualCare")
 
 TRACK_merge$Survey.Package.Name = t(as.data.frame(str_split(TRACK_merge$Survey.Package.Name, " : ")))[,2]
 
@@ -141,7 +150,7 @@ if(date_options$MoniekMethod){
     }
   }
   
-  rm(i, incl_start, incl_end, this_pat)
+  rm(i, incl_start, incl_end, this_pat, incl_day)
 }else{ # My own method
   for (i in 1:length(pat_list)){
     this_pat = TRACK_merge$Participant.Id == pat_list[i]
@@ -166,10 +175,18 @@ if(date_options$MoniekMethod){
     }
   }
   
-  rm(i, incl_dates, close_start, close_end, this_pat)
+  rm(i, j, incl_dates, close_start, close_end, this_pat)
 }
 
 TRACK_merge$StartEndVisit = as.factor(TRACK_merge$StartEndVisit)
+
+# Data frame with one row per patient, only first and last visit
+TRACK_pat = ADEM2_sub
+TRACK_pat = merge(TRACK_pat, TRACK_merge[TRACK_merge$StartEndVisit %in% "Start", c(1, 7)])
+colnames(TRACK_pat)[colnames(TRACK_pat) == "TRACKSUM"] = "TRACKSUM_Start"
+TRACK_pat = merge(TRACK_pat, TRACK_merge[TRACK_merge$StartEndVisit %in% "End", c(1, 7, 9)])
+colnames(TRACK_pat)[colnames(TRACK_pat) == "TRACKSUM"] = "TRACKSUM_End"
+colnames(TRACK_pat)[colnames(TRACK_pat) == "DaysSince1stVisit"] = "LastVisit"
 
 # By Group
 grp = 1
@@ -187,10 +204,27 @@ care = 1
 mean(pat_startend[pat_startend$breathRes == levels(pat_startend$breathRes)[care], 6+day], na.rm = T)
 sd(pat_startend[pat_startend$breathRes == levels(pat_startend$breathRes)[care], 6+day], na.rm = T)
 
-rm(pat_days)
-# Kruskal-Wallis test ----
-# Test, no changes (counts same patient multiple times)
-# kruskal.test(TRACKSUM ~ V1_Incl_StGroup, data = TRACK_merge, na.action = "na.omit")
-kruskal.test(TRACKSUM ~ V1_Rand_RandGroup, data = TRACK_merge, na.action = "na.omit")
+rm(pat_days, grp, day, care)
 
-# Test, only latest
+# Statistical tests ----
+# Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
+## Statistical tests ----
+# Checking statistical assumptions to choose parametric or non-parametric test
+shapiro.test(TRACK_merge$TRACKSUM) # Normality of TRACK results
+fligner.test(TRACKSUM ~ V1_Rand_BreathResult, data = TRACK_merge, na.action = "na.omit") # Variance-independence
+# We expect variables to be correlated, since they are different indicators for the health of the child.
+# Because distribution is not normally distributed, we are not confident that variance is homogeneous,
+# and we expect variables to be correlated we must take non-parametric tests.
+
+# All tests, patients repeated
+# Categorical predictor with three groups of quantitative outcome: Kruskal-Wallis
+kruskal.test(TRACKSUM ~ V1_Rand_BreathResult, data = TRACK_merge, na.action = "na.omit")
+# Categorical predictor with two groups of quantitative outcome: Sign test
+binom.test(sum(TRACK_merge$TRACKSUM >= 80, na.rm = T), sum(!is.na(TRACK_merge$TRACKSUM)), alternative = "two.sided")
+
+# Test if difference between start and end
+wilcox.test(TRACK_pat$TRACKSUM_Start, TRACK_pat$TRACKSUM_End, paired = TRUE, na.action = "na.omit")
+wilcox.test(TRACK_pat$TRACKSUM_Start[TRACK_pat$V1_Rand_BreathResult == "Asthma"], TRACK_pat$TRACKSUM_End[TRACK_pat$V1_Rand_BreathResult == "Asthma"], paired = TRUE, na.action = "na.omit")
+wilcox.test(TRACK_pat$TRACKSUM_Start[TRACK_pat$V1_Rand_BreathResult == "TransWheeze"], TRACK_pat$TRACKSUM_End[TRACK_pat$V1_Rand_BreathResult == "TransWheeze"], paired = TRUE, na.action = "na.omit")
+
+## Linear mixed-effect models ----
