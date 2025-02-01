@@ -96,12 +96,25 @@ ADEM2_sub$V1_Rand_BreathResult = relevel(ADEM2_sub$V1_Rand_BreathResult, "TransW
 
 TRACK_merge$Survey.Package.Name = t(as.data.frame(str_split(TRACK_merge$Survey.Package.Name, " : ")))[,2]
 
+TRACK_merge$AgeAtVisit = as.numeric(TRACK_merge$Survey.Creation.Date - TRACK_merge$V1_Demo_DOB)/365
+
 rm(breathresults)
+
+## Cleaning ISAAC Survey ----
+ISAAC_qs = list(questions = c("ISAACa02"),
+                levels = list(c("No", "Yes")))
+
+names(ISAAC_qs$levels) = ISAAC_qs$questions
+
+ISAAC_sub = surveys$ISAAC[,c(1,3,8:50)]
+
+ISAAC_sub$Survey.Package.Name = t(as.data.frame(str_split(ISAAC_sub$Survey.Package.Name, " : ")))[,2]
+
 # Replicating Moniek's analysis ----
 date_options = list(day_bwidth = 90,
                     days = c(0, 180, 360, 520),
                     start_day = 0,
-                    end_day = 520,
+                    end_day = 730,
                     MoniekMethod = FALSE)
 
 ## Start-End analysis ----
@@ -160,12 +173,19 @@ startend_analysis = function(TRACK_merge, date_options){
       TRACK_merge$DaysSince1stVisit[this_pat] = incl_dates - min(incl_dates)
       
       # Diverges from Moniek, she takes all inclusions within 90 days of the first and last, I think it's a mistake
-      close_start = which.min(abs((incl_dates - min(incl_dates)) - date_options$start_day))
-      close_end = which.min(abs((incl_dates - min(incl_dates)) - date_options$end_day))
+      start = abs((incl_dates - min(incl_dates)) - date_options$start_day)
+      close_start = which.min(start)
+      end = abs((incl_dates - min(incl_dates)) - date_options$end_day)
+      close_end = which.min(end)
       
-      TRACK_merge$StartEndVisit[this_pat][close_start] = "Start"
-      TRACK_merge$StartEndVisit[this_pat][close_end] = "End"
+      if(close_start %in% which(start<date_options$day_bwidth)){
+        TRACK_merge$StartEndVisit[this_pat][close_start] = "Start"
+      }
+      if(close_end %in% which(end<date_options$day_bwidth)){
+        TRACK_merge$StartEndVisit[this_pat][close_end] = "End"
+      }
       
+      # I end up not using pat_startend for anything, but I'll keep it here just in case
       pat_startend$start[i] = TRACK_merge$TRACKSUM[this_pat][close_start]
       pat_startend$end[i] = TRACK_merge$TRACKSUM[this_pat][close_end]
       pat_startend$change[i] = pat_startend$end[i] - pat_startend$start[i]
@@ -184,13 +204,14 @@ startend_analysis = function(TRACK_merge, date_options){
   return(TRACK_merge)
 }
 
-TRACK_merge = startend_analysis(TRACK_merge, date_options)
+TRACK_merge_se = startend_analysis(TRACK_merge, date_options)
 
 # Data frame with one row per patient, only first and last visit
 startend_ByPatient = function(survey_df, patient_df){
   surveypatient_df = patient_df
-  surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "Start", c("Participant.Id", "TRACKSUM")])
+  surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "Start", c("Participant.Id", "TRACKSUM", "AgeAtVisit")])
   colnames(surveypatient_df)[colnames(surveypatient_df) == "TRACKSUM"] = "TRACKSUM_Start"
+  colnames(surveypatient_df)[colnames(surveypatient_df) == "AgeAtVisit"] = "Age1stVisit"
   surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "End", c("Participant.Id", "TRACKSUM", "DaysSince1stVisit")])
   colnames(surveypatient_df)[colnames(surveypatient_df) == "TRACKSUM"] = "TRACKSUM_End"
   colnames(surveypatient_df)[colnames(surveypatient_df) == "DaysSince1stVisit"] = "LastVisit"
@@ -200,26 +221,36 @@ startend_ByPatient = function(survey_df, patient_df){
   return(surveypatient_df)
 }
 
-TRACK_pat = startend_ByPatient(TRACK_merge, ADEM2_sub)
+TRACK_pat = startend_ByPatient(TRACK_merge_se, ADEM2_sub)
+
+# Incorporate ISAAC QoL results
+TRACK_pat = merge(TRACK_pat, ISAAC_sub[ISAAC_sub$Survey.Package.Name == "baselinevisite", c("Castor.Participant.ID", ISAAC_qs$questions)], by.x = "Participant.Id", by.y = "Castor.Participant.ID")
+for (i in 1:length(ISAAC_qs$questions)){
+  TRACK_pat[,ISAAC_qs$questions[i]] = as.factor(TRACK_pat[,ISAAC_qs$questions[i]])
+  levels(TRACK_pat[,ISAAC_qs$questions[i]]) = ISAAC_qs$levels[[i]]
+}
 
 # Statistical tests ----
 # Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
 ## Statistical tests ----
 # Checking normality
-patbools = list(UsualCare = TRACK_pat$V1_Rand_RandGroup == "UsualCare",
-                Intervention = TRACK_pat$V1_Rand_RandGroup == "Intervention",
-                Asthma = TRACK_pat$V1_Rand_BreathResult == "Asthma",
-                TransWheeze = TRACK_pat$V1_Rand_BreathResult == "TransWheeze")
+patbools = list(UsualCare = TRACK_pat$V1_Rand_RandGroup %in% "UsualCare",
+                Intervention = TRACK_pat$V1_Rand_RandGroup %in% "Intervention",
+                Asthma = TRACK_pat$V1_Rand_BreathResult %in% "Asthma",
+                TransWheeze = TRACK_pat$V1_Rand_BreathResult %in% "TransWheeze")
 
 histbins = seq(min(TRACK_pat$TRACKSUM_Diff, na.rm = T), max(TRACK_pat$TRACKSUM_Diff, na.rm = T), by = 5)
 
-hist(TRACK_pat$TRACKSUM_Diff, breaks =  histbins, main = "Histogram of TRACK score differences", xlab = "Score difference between start and end TRACK results")
-hist(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare], breaks =  histbins, main = "Histogram of TRACK score differences\n for control patients", xlab = "Score difference between start and end TRACK results")
-hist(TRACK_pat$TRACKSUM_Diff[patbools$Intervention], breaks =  histbins, main = "Histogram of TRACK score differences\n for intervention patients", xlab = "Score difference between start and end TRACK results")
-hist(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$Asthma], breaks =  histbins, main = "Histogram of TRACK score differences\n for control patients with Asthma", xlab = "Score difference between start and end TRACK results")
-hist(TRACK_pat$TRACKSUM_Diff[patbools$Intervention & patbools$Asthma], breaks =  histbins, main = "Histogram of TRACK score differences\n for intervention patients with Asthma", xlab = "Score difference between start and end TRACK results")
-hist(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$TransWheeze], breaks =  histbins, main = "Histogram of TRACK score differences\n for control patients with TransWheeze", xlab = "Score difference between start and end TRACK results")
-hist(TRACK_pat$TRACKSUM_Diff[patbools$Intervention & patbools$TransWheeze], breaks =  histbins, main = "Histogram of TRACK score differences\n for intervention patients with TransWheeze", xlab = "Score difference between start and end TRACK results")
+hist_txt = list(main = "Histogram of TRACK score differences", 
+                xlab = "Score difference between start and end TRACK results")
+
+hist(TRACK_pat$TRACKSUM_Diff, breaks =  histbins, main = hist_txt$main, xlab = hist_txt$xlab)
+hist(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare], breaks =  histbins, main = paste0(hist_txt$main, "\n for control patients (n = ", sum(patbools$UsualCare), ")"), xlab = hist_txt$xlab)
+hist(TRACK_pat$TRACKSUM_Diff[patbools$Intervention], breaks =  histbins, main = paste0(hist_txt$main, "\n for intervention patients (n = ", sum(patbools$Intervention), ")"), xlab = hist_txt$xlab)
+hist(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$Asthma], breaks =  histbins, main = paste0(hist_txt$main, "\n for control patients with Asthma (n = ", sum(patbools$UsualCare & patbools$Asthma), ")"), xlab = hist_txt$xlab)
+hist(TRACK_pat$TRACKSUM_Diff[patbools$Intervention & patbools$Asthma], breaks =  histbins, main = paste0(hist_txt$main, "\n for intervention patients with Asthma (n = ", sum(patbools$Intervention & patbools$Asthma), ")"), xlab = hist_txt$xlab)
+hist(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$TransWheeze], breaks =  histbins, main = paste0(hist_txt$main, "\n for control patients with TransWheeze (n = ", sum(patbools$UsualCare & patbools$TransWheeze), ")"), xlab = hist_txt$xlab)
+hist(TRACK_pat$TRACKSUM_Diff[patbools$Intervention & patbools$TransWheeze], breaks =  histbins, main = paste0(hist_txt$main, "\n for intervention patients with TransWheeze (n = ", sum(patbools$Intervention & patbools$TransWheeze), ")"), xlab = hist_txt$xlab)
 
 # Non-parametric tests of difference results
 wilcox.test(TRACK_pat$TRACKSUM_Start, TRACK_pat$TRACKSUM_End, paired = TRUE, na.action = "na.omit")
@@ -234,7 +265,7 @@ t.test(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$Asthma], TRACK_pat$
 t.test(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$TransWheeze], TRACK_pat$TRACKSUM_Diff[patbools$Intervention & patbools$TransWheeze], na.action = "na.omit")
 
 ## Linear regression ----
-TRACK_lm = lm(TRACKSUM_Diff ~ V1_Rand_BreathResult*V1_Rand_RandGroup + V1_Demo_DOB + LastVisit, data = TRACK_pat)
+TRACK_lm = lm(TRACKSUM_Diff ~ V1_Rand_BreathResult*V1_Rand_RandGroup + Age1stVisit + ISAACa02, data = TRACK_pat)
 summary(TRACK_lm)
 
 plot(TRACKSUM_Diff ~ V1_Rand_BreathResult*V1_Rand_RandGroup)
