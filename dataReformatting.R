@@ -8,10 +8,11 @@
 require(rstudioapi)
 require(ggplot2)
 require(stringr)
+require(tidyr)
 require(dplyr)
 require(datetime)
-require(nlme)
 require(lme4)
+require(nlme)
 
 # Load data ----
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -106,15 +107,27 @@ ISAAC_qs = list(questions = c("ISAACa02"),
 
 names(ISAAC_qs$levels) = ISAAC_qs$questions
 
-ISAAC_sub = surveys$ISAAC[,c(1,3,8:50)]
+ISAAC_sub = surveys$ISAAC[,c("Castor.Participant.ID","Survey.Creation.Date","Survey.Package.Name", ISAAC_qs$questions)]
 
 ISAAC_sub$Survey.Package.Name = t(as.data.frame(str_split(ISAAC_sub$Survey.Package.Name, " : ")))[,2]
+
+## Cleaning HCSRU Survey ----
+HCSRU_qs = list(questions = c("HCSRU13a2", "HCSRU14a2", "HCSRU15a2", "HCSRU16a2", "HCSRU21_01"), # paste0("HCSRU19_", 1:10, "a")
+                costs = c(33, 259, 116, 476, 34.75))
+
+HCSRU_sub = surveys$HCSRU[,c("Castor.Participant.ID","Survey.Creation.Date","Survey.Package.Name", HCSRU_qs$questions)]
+
+for (i in 1:length(HCSRU_qs$questions)){
+  HCSRU_sub[is.na(HCSRU_sub[,HCSRU_qs$questions[i]]), HCSRU_qs$questions[i]] = 0
+}
+
+HCSRU_sub$TotalCost = as.numeric(as.matrix(HCSRU_sub[, HCSRU_qs$questions]) %*% as.matrix(HCSRU_qs$costs))
 
 # Replicating Moniek's analysis ----
 date_options = list(day_bwidth = 90,
                     days = c(0, 180, 360, 520),
                     start_day = 0,
-                    end_day = 730,
+                    end_day = c(180, 360, 540, 720),
                     MoniekMethod = FALSE)
 
 ## Start-End analysis ----
@@ -175,14 +188,17 @@ startend_analysis = function(TRACK_merge, date_options){
       # Diverges from Moniek, she takes all inclusions within 90 days of the first and last, I think it's a mistake
       start = abs((incl_dates - min(incl_dates)) - date_options$start_day)
       close_start = which.min(start)
-      end = abs((incl_dates - min(incl_dates)) - date_options$end_day)
-      close_end = which.min(end)
       
       if(close_start %in% which(start<date_options$day_bwidth)){
         TRACK_merge$StartEndVisit[this_pat][close_start] = "Start"
       }
-      if(close_end %in% which(end<date_options$day_bwidth)){
-        TRACK_merge$StartEndVisit[this_pat][close_end] = "End"
+      
+      for (j in 1:length(date_options$end_day)){
+        end = abs((incl_dates - min(incl_dates)) - date_options$end_day[j])
+        close_end = which.min(end)
+        if(close_end %in% which(end<date_options$day_bwidth)){
+          TRACK_merge$StartEndVisit[this_pat][close_end] = paste0("End", date_options$end_day[j])
+        }
       }
       
       # I end up not using pat_startend for anything, but I'll keep it here just in case
@@ -200,6 +216,7 @@ startend_analysis = function(TRACK_merge, date_options){
   }
   
   TRACK_merge$StartEndVisit = as.factor(TRACK_merge$StartEndVisit)
+  TRACK_merge$StartEndVisit = relevel(TRACK_merge$StartEndVisit, ref = "Start")
   
   return(TRACK_merge)
 }
@@ -207,21 +224,49 @@ startend_analysis = function(TRACK_merge, date_options){
 TRACK_merge_se = startend_analysis(TRACK_merge, date_options)
 
 # Data frame with one row per patient, only first and last visit
-startend_ByPatient = function(survey_df, patient_df){
+startend_ByPatient = function(survey_df, patient_df, format){
   surveypatient_df = patient_df
-  surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "Start", c("Participant.Id", "TRACKSUM", "AgeAtVisit")])
-  colnames(surveypatient_df)[colnames(surveypatient_df) == "TRACKSUM"] = "TRACKSUM_Start"
-  colnames(surveypatient_df)[colnames(surveypatient_df) == "AgeAtVisit"] = "Age1stVisit"
-  surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "End", c("Participant.Id", "TRACKSUM", "DaysSince1stVisit")])
-  colnames(surveypatient_df)[colnames(surveypatient_df) == "TRACKSUM"] = "TRACKSUM_End"
-  colnames(surveypatient_df)[colnames(surveypatient_df) == "DaysSince1stVisit"] = "LastVisit"
-  
-  surveypatient_df$TRACKSUM_Diff = surveypatient_df$TRACKSUM_End - surveypatient_df$TRACKSUM_Start
-  
+  startends = levels(survey_df$StartEndVisit)
+  if (format == "long"){
+    surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "Start", c("Participant.Id", "TRACKSUM", "AgeAtVisit")])
+    colnames(surveypatient_df)[colnames(surveypatient_df) == "TRACKSUM"] = "TRACKSUM_Start"
+    colnames(surveypatient_df)[colnames(surveypatient_df) == "AgeAtVisit"] = "Age1stVisit"
+    template_df = surveypatient_df
+    
+    surveypatient_df$TRACKSUM_End = surveypatient_df$TRACKSUM_Start
+    surveypatient_df$DaysSince1stVisit = 0
+    for (i in 1:length(startends)){
+      if (startends[i]=="Start"){
+      }else{
+        temp_df = merge(template_df, survey_df[survey_df$StartEndVisit %in% startends[i], c("Participant.Id", "TRACKSUM", "DaysSince1stVisit")])
+        colnames(temp_df)[colnames(temp_df) == "TRACKSUM"] = "TRACKSUM_End"
+        #colnames(surveypatient_df)[colnames(surveypatient_df) == "DaysSince1stVisit"] = paste0("VisitDay", startends[i])
+        
+        #surveypatient_df[paste0("TRACKSUM_Diff", startends[i])] = surveypatient_df[paste0("TRACKSUM_", startends[i])] - surveypatient_df$TRACKSUM_Start
+        surveypatient_df = rbind(surveypatient_df, temp_df)
+      }
+    }
+    surveypatient_df$TRACKSUM_Diff = surveypatient_df$TRACKSUM_End - surveypatient_df$TRACKSUM_Start
+    surveypatient_df$WellControlled = surveypatient_df$TRACKSUM_End >= 80
+  }else{
+    for (i in 1:length(startends)){
+      if (startends[i]=="Start"){
+        surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "Start", c("Participant.Id", "TRACKSUM", "AgeAtVisit")])
+        colnames(surveypatient_df)[colnames(surveypatient_df) == "TRACKSUM"] = "TRACKSUM_Start"
+        colnames(surveypatient_df)[colnames(surveypatient_df) == "AgeAtVisit"] = "Age1stVisit"
+      }else{
+        surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% startends[i], c("Participant.Id", "TRACKSUM", "DaysSince1stVisit")])
+        colnames(surveypatient_df)[colnames(surveypatient_df) == "TRACKSUM"] = paste0("TRACKSUM_", startends[i])
+        colnames(surveypatient_df)[colnames(surveypatient_df) == "DaysSince1stVisit"] = paste0("VisitDay", startends[i])
+        
+        surveypatient_df[paste0("TRACKSUM_Diff", startends[i])] = surveypatient_df[paste0("TRACKSUM_", startends[i])] - surveypatient_df$TRACKSUM_Start
+      }
+    }
+  }
   return(surveypatient_df)
 }
 
-TRACK_pat = startend_ByPatient(TRACK_merge_se, ADEM2_sub)
+TRACK_pat = startend_ByPatient(TRACK_merge_se, ADEM2_sub, format = "wide")
 
 # Incorporate ISAAC QoL results
 TRACK_pat = merge(TRACK_pat, ISAAC_sub[ISAAC_sub$Survey.Package.Name == "baselinevisite", c("Castor.Participant.ID", ISAAC_qs$questions)], by.x = "Participant.Id", by.y = "Castor.Participant.ID")
@@ -229,6 +274,9 @@ for (i in 1:length(ISAAC_qs$questions)){
   TRACK_pat[,ISAAC_qs$questions[i]] = as.factor(TRACK_pat[,ISAAC_qs$questions[i]])
   levels(TRACK_pat[,ISAAC_qs$questions[i]]) = ISAAC_qs$levels[[i]]
 }
+
+# Incorporate HCSRU cost results
+TRACK_pat = merge(TRACK_pat, HCSRU_sub[, c("Castor.Participant.ID", "TotalCost")], by.x = "Participant.Id", by.y = "Castor.Participant.ID")
 
 # Statistical tests ----
 # Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
@@ -265,7 +313,23 @@ t.test(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$Asthma], TRACK_pat$
 t.test(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$TransWheeze], TRACK_pat$TRACKSUM_Diff[patbools$Intervention & patbools$TransWheeze], na.action = "na.omit")
 
 ## Linear regression ----
-TRACK_lm = lm(TRACKSUM_Diff ~ V1_Rand_BreathResult*V1_Rand_RandGroup + Age1stVisit + ISAACa02, data = TRACK_pat)
+TRACK_lm = lm(TRACKSUM_Diff ~ V1_Rand_BreathResult + DaysSince1stVisit*V1_Rand_RandGroup + Age1stVisit + ISAACa02, data = TRACK_pat, na.action = "na.omit")
 summary(TRACK_lm)
+
+## Logistic regression ----
+lgm = glm(TRACKSUM_Diff ~ V1_Rand_BreathResult + V1_Rand_RandGroup + Age1stVisit + ISAACa02 + DaysSince1stVisit, family = "binomial", data = TRACK_pat)
+
+## Linear/logistic mixed models ----
+GLM = glm(TRACKSUM_DiffEnd720 ~ V1_Rand_BreathResult + Age1stVisit + ISAACa02, data = TRACK_pat, na.action = "na.omit")
+lmm180 = lme(TRACKSUM_DiffEnd180 ~ Age1stVisit + V1_Rand_BreathResult + ISAACa02, data = TRACK_pat, 
+                random = ~ 1|V1_Rand_RandGroup, na.action = "na.omit")
+lmm360 = lme(TRACKSUM_DiffEnd360 ~ Age1stVisit + V1_Rand_BreathResult + ISAACa02, data = TRACK_pat, 
+             random = ~1|V1_Rand_RandGroup, na.action = "na.omit")
+lmm540 = lme(TRACKSUM_DiffEnd540 ~ Age1stVisit + V1_Rand_BreathResult + ISAACa02, data = TRACK_pat, 
+             random = ~1|V1_Rand_RandGroup, na.action = "na.omit")
+lmm720 = lme(TRACKSUM_DiffEnd720 ~ Age1stVisit + V1_Rand_BreathResult + ISAACa02, data = TRACK_pat, 
+             random = ~1|V1_Rand_RandGroup, na.action = "na.omit")
+
+anova(GLM, lmm180, lmm360, lmm540, lmm720)
 
 plot(TRACKSUM_Diff ~ V1_Rand_BreathResult*V1_Rand_RandGroup)
