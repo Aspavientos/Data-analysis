@@ -247,7 +247,7 @@ startend_ByPatient = function(survey_df, patient_df, format){
       }
     }
     surveypatient_df$TRACKSUM_Diff = surveypatient_df$TRACKSUM_End - surveypatient_df$TRACKSUM_Start
-    surveypatient_df$WellControlled = surveypatient_df$TRACKSUM_End >= 80
+    surveypatient_df$UnderControl = surveypatient_df$TRACKSUM_End >= 80
   }else{
     for (i in 1:length(startends)){
       if (startends[i]=="Start"){
@@ -266,7 +266,7 @@ startend_ByPatient = function(survey_df, patient_df, format){
   return(surveypatient_df)
 }
 
-TRACK_pat = startend_ByPatient(TRACK_merge_se, ADEM2_sub, format = "wide")
+TRACK_pat = startend_ByPatient(TRACK_merge_se, ADEM2_sub, format = "long")
 
 # Incorporate ISAAC QoL results
 TRACK_pat = merge(TRACK_pat, ISAAC_sub[ISAAC_sub$Survey.Package.Name == "baselinevisite", c("Castor.Participant.ID", ISAAC_qs$questions)], by.x = "Participant.Id", by.y = "Castor.Participant.ID")
@@ -278,9 +278,34 @@ for (i in 1:length(ISAAC_qs$questions)){
 # Incorporate HCSRU cost results
 TRACK_pat = merge(TRACK_pat, HCSRU_sub[, c("Castor.Participant.ID", "TotalCost")], by.x = "Participant.Id", by.y = "Castor.Participant.ID")
 
-# Statistical tests ----
-# Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
+# Tests and plots ----
+## Plots ----
+customggsave = function(plot, upscale = 1.5, save_path = '', name = NULL) {
+  save_path = paste0('./Plots', save_path)
+  if (is.null(name)) {
+    name = deparse(substitute(plot))
+  }
+  ggsave(
+    paste0(name, ".png"),
+    plot = plot,
+    device = 'png',
+    width = round(1920 * upscale),
+    height = round(1080 * upscale),
+    units = 'px',
+    path = save_path
+  )
+}
+
+means = aggregate(TRACKSUM_DiffEnd720 ~ V1_Rand_RandGroup + V1_Rand_BreathResult, TRACK_pat, median)
+
+plot = ggplot(data = TRACK_pat, aes(x = V1_Rand_BreathResult, fill = UnderControl)) +
+  geom_bar(position = 'fill')
+  #+ geom_label(data = means, aes(label = round(TRACKSUM_DiffEnd720)), position = position_dodge2(width = 1))
+
+customggsave(plot)
+
 ## Statistical tests ----
+# Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
 # Checking normality
 patbools = list(UsualCare = TRACK_pat$V1_Rand_RandGroup %in% "UsualCare",
                 Intervention = TRACK_pat$V1_Rand_RandGroup %in% "Intervention",
@@ -292,13 +317,7 @@ histbins = seq(min(TRACK_pat$TRACKSUM_Diff, na.rm = T), max(TRACK_pat$TRACKSUM_D
 hist_txt = list(main = "Histogram of TRACK score differences", 
                 xlab = "Score difference between start and end TRACK results")
 
-hist(TRACK_pat$TRACKSUM_Diff, breaks =  histbins, main = hist_txt$main, xlab = hist_txt$xlab)
-hist(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare], breaks =  histbins, main = paste0(hist_txt$main, "\n for control patients (n = ", sum(patbools$UsualCare), ")"), xlab = hist_txt$xlab)
-hist(TRACK_pat$TRACKSUM_Diff[patbools$Intervention], breaks =  histbins, main = paste0(hist_txt$main, "\n for intervention patients (n = ", sum(patbools$Intervention), ")"), xlab = hist_txt$xlab)
-hist(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$Asthma], breaks =  histbins, main = paste0(hist_txt$main, "\n for control patients with Asthma (n = ", sum(patbools$UsualCare & patbools$Asthma), ")"), xlab = hist_txt$xlab)
-hist(TRACK_pat$TRACKSUM_Diff[patbools$Intervention & patbools$Asthma], breaks =  histbins, main = paste0(hist_txt$main, "\n for intervention patients with Asthma (n = ", sum(patbools$Intervention & patbools$Asthma), ")"), xlab = hist_txt$xlab)
-hist(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$TransWheeze], breaks =  histbins, main = paste0(hist_txt$main, "\n for control patients with TransWheeze (n = ", sum(patbools$UsualCare & patbools$TransWheeze), ")"), xlab = hist_txt$xlab)
-hist(TRACK_pat$TRACKSUM_Diff[patbools$Intervention & patbools$TransWheeze], breaks =  histbins, main = paste0(hist_txt$main, "\n for intervention patients with TransWheeze (n = ", sum(patbools$Intervention & patbools$TransWheeze), ")"), xlab = hist_txt$xlab)
+hist(, breaks = histbins, main = hist_txt$main, xlab = hist_txt$xlab)
 
 # Non-parametric tests of difference results
 wilcox.test(TRACK_pat$TRACKSUM_Start, TRACK_pat$TRACKSUM_End, paired = TRUE, na.action = "na.omit")
