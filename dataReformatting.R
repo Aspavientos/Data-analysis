@@ -13,6 +13,7 @@ require(dplyr)
 require(datetime)
 require(lme4)
 require(nlme)
+require(scales)
 
 # Load data ----
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -235,17 +236,21 @@ startend_ByPatient = function(survey_df, patient_df, format){
     
     surveypatient_df$TRACKSUM_End = surveypatient_df$TRACKSUM_Start
     surveypatient_df$DaysSince1stVisit = 0
+    surveypatient_df$DayBin = "Start"
     for (i in 1:length(startends)){
       if (startends[i]=="Start"){
       }else{
         temp_df = merge(template_df, survey_df[survey_df$StartEndVisit %in% startends[i], c("Participant.Id", "TRACKSUM", "DaysSince1stVisit")])
         colnames(temp_df)[colnames(temp_df) == "TRACKSUM"] = "TRACKSUM_End"
+        temp_df$DayBin = startends[i]
         #colnames(surveypatient_df)[colnames(surveypatient_df) == "DaysSince1stVisit"] = paste0("VisitDay", startends[i])
         
         #surveypatient_df[paste0("TRACKSUM_Diff", startends[i])] = surveypatient_df[paste0("TRACKSUM_", startends[i])] - surveypatient_df$TRACKSUM_Start
         surveypatient_df = rbind(surveypatient_df, temp_df)
       }
     }
+    surveypatient_df$DayBin = as.factor(surveypatient_df$DayBin)
+    surveypatient_df$DayBin = relevel(surveypatient_df$DayBin, "Start")
     surveypatient_df$TRACKSUM_Diff = surveypatient_df$TRACKSUM_End - surveypatient_df$TRACKSUM_Start
     surveypatient_df$UnderControl = surveypatient_df$TRACKSUM_End >= 80
   }else{
@@ -266,7 +271,7 @@ startend_ByPatient = function(survey_df, patient_df, format){
   return(surveypatient_df)
 }
 
-TRACK_pat = startend_ByPatient(TRACK_merge_se, ADEM2_sub, format = "long")
+TRACK_pat = startend_ByPatient(TRACK_merge_se, ADEM2_sub, format = "wide")
 
 # Incorporate ISAAC QoL results
 TRACK_pat = merge(TRACK_pat, ISAAC_sub[ISAAC_sub$Survey.Package.Name == "baselinevisite", c("Castor.Participant.ID", ISAAC_qs$questions)], by.x = "Participant.Id", by.y = "Castor.Participant.ID")
@@ -277,6 +282,14 @@ for (i in 1:length(ISAAC_qs$questions)){
 
 # Incorporate HCSRU cost results
 TRACK_pat = merge(TRACK_pat, HCSRU_sub[, c("Castor.Participant.ID", "TotalCost")], by.x = "Participant.Id", by.y = "Castor.Participant.ID")
+
+# Remove NAs
+TRACK_plot = TRACK_pat
+TRACK_plot = subset(TRACK_plot, !is.na(V1_Rand_RandGroup))
+TRACK_plot = subset(TRACK_plot, !is.na(V1_Rand_BreathResult))
+
+# Combine columns for plots
+TRACK_plot = TRACK_plot %>% unite(GroupTest, c(V1_Rand_RandGroup, V1_Rand_BreathResult), sep = " ", remove = F)
 
 # Tests and plots ----
 ## Plots ----
@@ -296,13 +309,52 @@ customggsave = function(plot, upscale = 1.5, save_path = '', name = NULL) {
   )
 }
 
-means = aggregate(TRACKSUM_DiffEnd720 ~ V1_Rand_RandGroup + V1_Rand_BreathResult, TRACK_pat, median)
+cutie_layer = function() {
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    legend.position = 'bottom'
+  )
+}
 
-plot = ggplot(data = TRACK_pat, aes(x = V1_Rand_BreathResult, fill = UnderControl)) +
-  geom_bar(position = 'fill')
-  #+ geom_label(data = means, aes(label = round(TRACKSUM_DiffEnd720)), position = position_dodge2(width = 1))
+means = aggregate(TotalCost ~ V1_Rand_RandGroup + V1_Rand_BreathResult, TRACK_pat, median)
+plotbools = list(UsualCare = TRACK_plot$V1_Rand_RandGroup %in% "UsualCare",
+                Intervention = TRACK_plot$V1_Rand_RandGroup %in% "Intervention",
+                Asthma = TRACK_plot$V1_Rand_BreathResult %in% "Asthma",
+                TransWheeze = TRACK_plot$V1_Rand_BreathResult %in% "TransWheeze")
 
-customggsave(plot)
+group_colors = list(TransWheeze = "#00BFC4",
+                    Asthma = "#F8766D",
+                    UsualCare = "#7CAE00",
+                    Intervention = "#C77CFF")
+
+euro_label = label_currency(
+  accuracy = 1,
+  prefix = "",
+  suffix = " €",
+  big.mark = ".",
+  decimal.mark = ","
+)
+
+plot = ggplot(data = TRACK_plot, aes(x = V1_Rand_RandGroup, y = TotalCost, color = V1_Rand_BreathResult)) +
+  geom_boxplot() +
+  stat_summary(mapping = aes(label = euro_label(..y..)), fun = "median", geom = "label", position = position_dodge(width = 0.75)) +
+  scale_x_discrete(name = "Experimental group", labels = c(paste0("Control (n = ", sum(plotbools$UsualCare), ")"), paste0("Intervention (n = ", sum(plotbools$Intervention), ")"))) +
+  scale_y_continuous(name = "Total cost", labels = euro_label) +
+  scale_color_discrete(name = "Breath test results", labels = c(paste0("Transient Wheeze (n = ", sum(plotbools$TransWheeze), ")"), paste0("Asthma (n = ", sum(plotbools$Asthma), ")"))) +
+  ggtitle(label = "Difference in total cost to family and healthcare system per patient") +
+  theme_bw() + cutie_layer()
+
+plot = ggplot(data = subset(TRACK_plot, !(DayBin %in% "Start")), aes(x = DayBin, y = TRACKSUM_Diff, color = V1_Rand_BreathResult)) +
+  geom_boxplot() +
+  stat_summary(mapping = aes(label = ..y..), fun = "median", geom = "label", position = position_dodge(width = 0.75)) +
+  scale_x_discrete(name = "Days", labels = date_options$end_day) +
+  scale_y_continuous(name = "Difference in TRACK score") +
+  scale_color_manual(name = "Breath test results", labels = c(paste0("Transient Wheeze (n = ", sum(plotbools$TransWheeze), ")"), paste0("Asthma (n = ", sum(plotbools$Asthma), ")")), values = c(group_colors$TransWheeze, group_colors$Asthma)) +
+  ggtitle(label = "Difference in TRACK score compared to baseline") +
+  theme_bw() + cutie_layer()
+
+customggsave(plot, name = "Difference in TRACK score test results compared to baseline")
 
 ## Statistical tests ----
 # Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
@@ -332,11 +384,12 @@ t.test(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$Asthma], TRACK_pat$
 t.test(TRACK_pat$TRACKSUM_Diff[patbools$UsualCare & patbools$TransWheeze], TRACK_pat$TRACKSUM_Diff[patbools$Intervention & patbools$TransWheeze], na.action = "na.omit")
 
 ## Linear regression ----
-TRACK_lm = lm(TRACKSUM_Diff ~ V1_Rand_BreathResult + DaysSince1stVisit*V1_Rand_RandGroup + Age1stVisit + ISAACa02, data = TRACK_pat, na.action = "na.omit")
+TRACK_lm = lm(TotalCost ~ V1_Rand_BreathResult*V1_Rand_RandGroup + Age1stVisit, data = TRACK_pat, na.action = "na.omit")
 summary(TRACK_lm)
 
 ## Logistic regression ----
-lgm = glm(TRACKSUM_Diff ~ V1_Rand_BreathResult + V1_Rand_RandGroup + Age1stVisit + ISAACa02 + DaysSince1stVisit, family = "binomial", data = TRACK_pat)
+lgm = glm(UnderControl ~ V1_Rand_BreathResult + V1_Rand_RandGroup + Age1stVisit + DaysSince1stVisit, family = "binomial", data = TRACK_pat)
+summary(lgm)
 
 ## Linear/logistic mixed models ----
 GLM = glm(TRACKSUM_DiffEnd720 ~ V1_Rand_BreathResult + Age1stVisit + ISAACa02, data = TRACK_pat, na.action = "na.omit")
