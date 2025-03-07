@@ -105,8 +105,9 @@ TRACK_merge$AgeAtVisit = as.numeric(TRACK_merge$Survey.Creation.Date - TRACK_mer
 rm(breathresults)
 
 ## Cleaning ISAAC Survey ----
-ISAAC_qs = list(questions = c("ISAACa02"),
-                levels = list(c("No", "Yes")))
+ISAAC_qs = list(questions = c("ISAACa02", "ISAACa03"),
+                vartype = c("factor", "numeric"), 
+                levels = list(c("No", "Yes"), NULL))
 
 names(ISAAC_qs$levels) = ISAAC_qs$questions
 
@@ -116,8 +117,9 @@ ISAAC_sub$Survey.Package.Name = t(as.data.frame(str_split(ISAAC_sub$Survey.Packa
 colnames(ISAAC_sub)[colnames(ISAAC_sub) %in% "Castor.Participant.ID"] = "Participant.Id"
 
 ## Cleaning HCSRU Survey ----
-HCSRU_qs = list(questions = c("HCSRU13a2", "HCSRU14a2", "HCSRU15a2", "HCSRU16a2", "HCSRU21_01"), # paste0("HCSRU19_", 1:10, "a")
-                costs = c(33, 259, 116, 476, 34.75))
+HCSRU_qs = list(questions = c("HCSRU13b1", "HCSRU13b2", "HCSRU13b3", "HCSRU14a2", "HCSRU15a2", "HCSRU16a2", "HCSRU21_01"), # paste0("HCSRU19_", 1:10, "a")
+                source = c("Direct", "Direct", "Direct", "Direct", "Direct", "Direct", "Indirect"),
+                costs = c(30.87, 43.31, 30.87, 258, 138, 537, 39.88*8))
 
 HCSRU_sub = surveys$HCSRU[,c("Castor.Participant.ID","Survey.Creation.Date","Survey.Package.Name", HCSRU_qs$questions)]
 
@@ -125,7 +127,10 @@ for (i in 1:length(HCSRU_qs$questions)){
   HCSRU_sub[is.na(HCSRU_sub[,HCSRU_qs$questions[i]]), HCSRU_qs$questions[i]] = 0
 }
 
-HCSRU_sub$TotalCost = as.numeric(as.matrix(HCSRU_sub[, HCSRU_qs$questions]) %*% as.matrix(HCSRU_qs$costs))
+# Splitting direct and indirect costs
+HCSRU_sub$DirectCost = as.numeric(as.matrix(HCSRU_sub[, HCSRU_qs$questions[HCSRU_qs$source %in% "Direct"]]) %*% as.matrix(HCSRU_qs$costs[HCSRU_qs$source %in% "Direct"]))
+HCSRU_sub$IndirectCost = as.numeric(as.matrix(HCSRU_sub[, HCSRU_qs$questions[HCSRU_qs$source %in% "Indirect"]]) %*% as.matrix(HCSRU_qs$costs[HCSRU_qs$source %in% "Indirect"]))
+
 colnames(HCSRU_sub)[colnames(HCSRU_sub) %in% "Castor.Participant.ID"] = "Participant.Id"
 
 # Replicating Moniek's analysis ----
@@ -165,10 +170,10 @@ startend_analysis = function(TRACK_merge, date_options){
     
     TRACK_merge$StartEndVisit = rep(NA, nrow(TRACK_merge))
     incl_start = (abs(TRACK_merge$DaysSince1stVisit - date_options$start_day) <= date_options$day_bwidth)
-    TRACK_merge$StartEndVisit[incl_start] = "Day 0"
+    TRACK_merge$StartEndVisit[incl_start] = "Day0"
     
     incl_end = (abs(TRACK_merge$DaysSince1stVisit - date_options$end_day) <= date_options$day_bwidth)
-    TRACK_merge$StartEndVisit[incl_end] = paste("Day", date_options$end_day)
+    TRACK_merge$StartEndVisit[incl_end] = paste0("Day", date_options$end_day)
     
     for (i in 1:length(pat_list)){
       this_pat = TRACK_merge$Participant.Id == pat_list[i]
@@ -196,14 +201,14 @@ startend_analysis = function(TRACK_merge, date_options){
       close_start = which.min(start)
       
       if(close_start %in% which(start<date_options$day_bwidth)){
-        TRACK_merge$StartEndVisit[this_pat][close_start] = "Day 0"
+        TRACK_merge$StartEndVisit[this_pat][close_start] = "Day0"
       }
       
       for (j in 1:length(date_options$end_day)){
         end = abs((incl_dates - min(incl_dates)) - date_options$end_day[j])
         close_end = which.min(end)
         if(close_end %in% which(end<date_options$day_bwidth)){
-          TRACK_merge$StartEndVisit[this_pat][close_end] = paste("Day", date_options$end_day[j])
+          TRACK_merge$StartEndVisit[this_pat][close_end] = paste0("Day", date_options$end_day[j])
         }
       }
       
@@ -222,7 +227,7 @@ startend_analysis = function(TRACK_merge, date_options){
   }
   
   TRACK_merge$StartEndVisit = as.factor(TRACK_merge$StartEndVisit)
-  TRACK_merge$StartEndVisit = relevel(TRACK_merge$StartEndVisit, ref = "Day 0")
+  TRACK_merge$StartEndVisit = relevel(TRACK_merge$StartEndVisit, ref = "Day0")
   
   return(TRACK_merge)
 }
@@ -235,12 +240,12 @@ startend_reformat = function(survey_df, patient_df, format, extraSurvey_list = N
   surveypatient_df = patient_df
   startends = levels(survey_df$StartEndVisit)
   if (format == "long"){ # Long formatting
-    surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "Day 0", c("Participant.Id", "TRACKSUM", "AgeAtVisit")])
+    surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "Day0", c("Participant.Id", "TRACKSUM", "AgeAtVisit")])
     colnames(surveypatient_df)[colnames(surveypatient_df) == "TRACKSUM"] = "TRACKSUM_Start"
     colnames(surveypatient_df)[colnames(surveypatient_df) == "AgeAtVisit"] = "Age1stVisit"
     template_df = surveypatient_df
     
-    surveypatient_df$StartEndVisit = "Day 0"
+    surveypatient_df$StartEndVisit = "Day0"
     surveypatient_df$TRACKSUM_End = surveypatient_df$TRACKSUM_Start
     surveypatient_df$DaysSince1stVisit = 0
     #surveypatient_df$DayBin = "Start"
@@ -255,13 +260,13 @@ startend_reformat = function(survey_df, patient_df, format, extraSurvey_list = N
       }
     }
     surveypatient_df$StartEndVisit = as.factor(surveypatient_df$StartEndVisit)
-    surveypatient_df$StartEndVisit = relevel(surveypatient_df$StartEndVisit, "Day 0")
+    surveypatient_df$StartEndVisit = relevel(surveypatient_df$StartEndVisit, "Day0")
     surveypatient_df$TRACKSUM_Diff = surveypatient_df$TRACKSUM_End - surveypatient_df$TRACKSUM_Start
     surveypatient_df$UnderControl = surveypatient_df$TRACKSUM_End >= 80
   }else{ # Wide formatting
     for (i in 1:length(startends)){
-      if (startends[i]=="Day 0"){
-        surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "Day 0", c("Participant.Id", "TRACKSUM", "AgeAtVisit")])
+      if (startends[i]=="Day0"){
+        surveypatient_df = merge(surveypatient_df, survey_df[survey_df$StartEndVisit %in% "Day0", c("Participant.Id", "TRACKSUM", "AgeAtVisit")])
         colnames(surveypatient_df)[colnames(surveypatient_df) == "TRACKSUM"] = "TRACKSUM_Start"
         colnames(surveypatient_df)[colnames(surveypatient_df) == "AgeAtVisit"] = "Age1stVisit"
       }else{
@@ -282,18 +287,22 @@ startend_reformat = function(survey_df, patient_df, format, extraSurvey_list = N
       ISAAC_sub = extraSurvey_list$df$ISAAC
       ISAAC_sub = ISAAC_sub[!is.na(ISAAC_sub$StartEndVisit),]
       if(format == "long"){
-        surveypatient_df = merge(surveypatient_df, ISAAC_sub[, c("Participant.Id", "StartEndVisit",ISAAC_qs$questions)])
+        surveypatient_df = merge(surveypatient_df, ISAAC_sub[, c("Participant.Id", "StartEndVisit", ISAAC_qs$questions)])
         for (k in 1:length(ISAAC_qs$questions)){
-          surveypatient_df[,ISAAC_qs$questions[k]] = as.factor(surveypatient_df[,ISAAC_qs$questions[k]])
-          levels(surveypatient_df[,ISAAC_qs$questions[k]]) = ISAAC_qs$levels[[k]]
+          if (ISAAC_qs$vartype[k] == "factor"){
+            surveypatient_df[,ISAAC_qs$questions[k]] = as.factor(surveypatient_df[,ISAAC_qs$questions[k]])
+            levels(surveypatient_df[,ISAAC_qs$questions[k]]) = ISAAC_qs$levels[[k]]
+          }
         }
       }else{
         isaac_startends = levels(ISAAC_sub$StartEndVisit)
         for (j in 1:length(isaac_startends)){
           surveypatient_df = merge(surveypatient_df, ISAAC_sub[ISAAC_sub$StartEndVisit %in% isaac_startends[j] ,c("Participant.Id", ISAAC_qs$questions)], all.x = T)
           for (k in 1:length(ISAAC_qs$questions)){
-            surveypatient_df[,ISAAC_qs$questions[k]] = as.factor(surveypatient_df[,ISAAC_qs$questions[k]])
-            levels(surveypatient_df[,ISAAC_qs$questions[k]]) = ISAAC_qs$levels[[k]]
+            if (ISAAC_qs$vartype[k] == "factor"){
+              surveypatient_df[,ISAAC_qs$questions[k]] = as.factor(surveypatient_df[,ISAAC_qs$questions[k]])
+              levels(surveypatient_df[,ISAAC_qs$questions[k]]) = ISAAC_qs$levels[[k]]
+            }
           }
           
           colnames(surveypatient_df)[colnames(surveypatient_df) %in% ISAAC_qs$questions] = paste0(ISAAC_qs$questions, isaac_startends[j])
@@ -304,7 +313,7 @@ startend_reformat = function(survey_df, patient_df, format, extraSurvey_list = N
     # HCSRU matching
     if(any(names(extraSurvey_list$df) %in% "HCSRU")){
       HCSRU_sub = extraSurvey_list$df$HCSRU
-      surveypatient_df = merge(surveypatient_df, HCSRU_sub[, c("Participant.Id", "TotalCost")])
+      surveypatient_df = merge(surveypatient_df, HCSRU_sub[, c("Participant.Id", "DirectCost", "IndirectCost")])
     }
   }
   
@@ -323,7 +332,6 @@ TRACK_wide = startend_reformat(TRACK_merge_se, ADEM2_sub, format = "wide", extra
 ## Plots ----
 # Remove NAs
 # Combine columns for plots
-TRACK_plot = TRACK_plot %>% unite(GroupTest, c(V1_Rand_RandGroup, V1_Rand_BreathResult), sep = " ", remove = F)
 
 customggsave = function(plot, upscale = 1.5, save_path = '', name = plot$labels$title) {
   save_path = paste0('./Plots', save_path)
@@ -349,60 +357,114 @@ cutie_layer = function(title, subtitle = NULL) {
              legend.position = 'bottom'))
 }
 
-plotbools = list(UsualCare = TRACK_plot$V1_Rand_RandGroup %in% "UsualCare",
-                Intervention = TRACK_plot$V1_Rand_RandGroup %in% "Intervention",
-                Asthma = TRACK_plot$V1_Rand_BreathResult %in% "Asthma",
-                TransWheeze = TRACK_plot$V1_Rand_BreathResult %in% "TransWheeze")
-
-group_colors = list(V1_Rand_BreathResult = c("#00BFC4", "#F8766D"),
-                    V1_Rand_RandGroup = c("#7CAE00","#C77CFF"),
-                    ISAACa02 = c("#B2C900", "#4D36FF"))
+makeGroupValues = function(df, format){
+  if (format == "long"){
+    group_values = list(Days = list(name = "Day of visit (± 90 days)",
+                                    labels = paste0(gsub("([0-9]+){1}", " \\1", levels(df$StartEndVisit)), " (n = ", count(df, StartEndVisit)$n, ")")),
+                        V1_Rand_BreathResult = list(name = "Breath test results",
+                                                    labels = paste0(c("Transient Wheeze (n = ", "Asthma (n = "), (df %>% subset(!is.na(V1_Rand_BreathResult)) %>% count(V1_Rand_BreathResult))$n, ")"),
+                                                    Colors = c("#00BFC4", "#F8766D"),
+                                                    LineType = c("solid", "longdash")),
+                        V1_Rand_RandGroup = list(name = "Experimental group",
+                                                 labels = paste0(c("Control (n = ", "Intervention (n = "), (df %>% subset(!is.na(V1_Rand_RandGroup)) %>% count(V1_Rand_RandGroup))$n, ")"),
+                                                 Colors = c("#7CAE00","#C77CFF"),
+                                                 LineType = c("solid", "longdash")))
+    
+    if ("ISAACa02" %in% colnames(df)){
+      group_values$ISAACa02 = list(name = "Previous asthma attacks",
+                                   labels = paste0(c("Yes (n =", "No (n ="), (df %>% subset(!is.na(ISAACa02)) %>% count(ISAACa02))$n, ")"),
+                                   Colors = c("#B2C900", "#4D36FF"), 
+                                   LineType = c("solid", "longdash"))
+    }
+    if ("ISAACa03" %in% colnames(df)){
+      colramp <- colorRampPalette(c("lightgray", "red"))
+      group_values$ISAACa03 = list(name = "Number of previous asthma attacks",
+                                   labels = paste0((df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$ISAACa03, " (n =", (df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$n, ")"),
+                                   Colors = colramp(df %>% subset(!is.na(ISAACa03)) %>% .$ISAACa03 %>% unique %>% length), 
+                                   LineType = c("solid", "longdash"))
+    }
+    
+    if (any(grepl("Cost", colnames(TRACK_plot_long), ignore.case = T))){
+      group_values$HCSRU = list(name = "Type of cost",
+                                labels = c("Direct", "Indirect"),
+                                Colors = c("#487FFF", "#B78000"),
+                                LineType = c("solid", "longdash"))
+    }
+  }else{
+    group_values = list(V1_Rand_BreathResult = list(name = "Breath test results",
+                                                    labels = paste0(c("Transient Wheeze (n = ", "Asthma (n = "), (df %>% subset(!is.na(V1_Rand_BreathResult)) %>% count(V1_Rand_BreathResult))$n, ")"),
+                                                    Colors = c("#00BFC4", "#F8766D"),
+                                                    LineType = c("solid", "longdash")),
+                        V1_Rand_RandGroup = list(name = "Experimental group",
+                                                 labels = paste0(c("Control (n = ", "Intervention (n = "), (df %>% subset(!is.na(V1_Rand_RandGroup)) %>% count(V1_Rand_RandGroup))$n, ")"),
+                                                 Colors = c("#7CAE00","#C77CFF"),
+                                                 LineType = c("solid", "longdash")),
+                        ISAACa02 = list(name = "Previous asthma attacks",
+                                        labels = c("Yes", "No"),
+                                        Colors = c("#B2C900", "#4D36FF"), 
+                                        LineType = c("solid", "longdash")),
+                        HCSRU = list(name = "Type of cost",
+                                     labels = c("Direct", "Indirect"),
+                                     Colors = c("#487FFF", "#B78000"),
+                                     LineType = c("solid", "longdash")))
+  }
+  return(group_values)
+}
                     
-euro_label = label_currency(
-  accuracy = 1,
-  prefix = "",
-  suffix = " €",
-  big.mark = ".",
-  decimal.mark = ","
-)
+euro_label = label_currency(accuracy = 1, prefix = "", suffix = " €", big.mark = ".", decimal.mark = ",")
 
 # Long-format plots
 TRACK_plot_long = TRACK_long
 TRACK_plot_long = subset(TRACK_plot_long, !is.na(V1_Rand_RandGroup))
 TRACK_plot_long = subset(TRACK_plot_long, !is.na(V1_Rand_BreathResult))
-# Cost between groups
-ggplot(data = TRACK_plot_long, aes(x = V1_Rand_RandGroup, y = TotalCost, color = V1_Rand_BreathResult)) +
-  geom_boxplot() +
-  stat_summary(mapping = aes(label = euro_label(..y..)), fun = "median", geom = "label", position = position_dodge(width = 0.75)) +
-  scale_x_discrete(name = "Experimental group", labels = paste0(c("Control (n = ", "Intervention (n = "), count(TRACK_plot_long, V1_Rand_RandGroup)$n, ")")) +
-  scale_y_continuous(name = "Total cost", labels = euro_label) +
-  scale_color_manual(name = "Breath test results", labels = paste0(c("Transient Wheeze (n = ", "Asthma (n = "), count(TRACK_plot_long, V1_Rand_BreathResult)$n, ")"), , values = group_colors$V1_Rand_BreathResult) +
-  cutie_layer(title = "Difference in total cost to family and healthcare system per patient")
+gv_long = makeGroupValues(TRACK_plot_long, "long")
+
 # TRACK score differences over time
-ggplot(data = subset(TRACK_plot_long, !(StartEndVisit %in% "Day 0")), aes(x = StartEndVisit, y = TRACKSUM_Diff, color = V1_Rand_BreathResult)) +
+ggplot(data = subset(TRACK_plot_long, !(StartEndVisit %in% "Day0")), aes(x = StartEndVisit, y = TRACKSUM_Diff, fill = V1_Rand_RandGroup, linetype = V1_Rand_RandGroup)) +
   geom_boxplot() +
-  stat_summary(mapping = aes(label = ..y..), fun = "median", geom = "label", position = position_dodge(width = 0.75)) +
-  scale_x_discrete(name = "Day of visit", labels = date_options$end_day) +
+  stat_summary(mapping = aes(label = ..y..), fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
+  scale_x_discrete(name = gv_long$Days$name, labels = gv_long$Days$labels) +
   scale_y_continuous(name = "Difference in TRACK score") +
-  scale_color_manual(name = "Breath test results", labels = paste0(c("Transient Wheeze (n = ", "Asthma (n = "), count(TRACK_plot_long, V1_Rand_BreathResult)$n, ")"), values = group_colors$V1_Rand_BreathResult) +
+  scale_fill_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$Colors) +
+  scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType) +
   cutie_layer(title = "Difference in TRACK score compared to baseline")
 # Plot asthma attacks over time (yes/no)
 ggplot(data = subset(TRACK_plot_long, !is.na(ISAACa02)), aes(x = StartEndVisit, fill = ISAACa02)) +
-  geom_bar(position = "fill") + 
-  scale_x_discrete(name = "Day of visit", labels = paste0(levels(TRACK_plot_long$StartEndVisit), " (n = ", count(TRACK_plot_long, StartEndVisit)$n, ")")) +
-  scale_y_continuous(name = "Fraction") +
-  scale_fill_manual(name = "Asthma attacks in the past 12 months", values = group_colors$ISAACa02) +
+  geom_bar(color = "black", linewidth = 1, position = "fill") + 
+  scale_x_discrete(name = "Day of visit (± 90 days)", labels = paste0(levels(TRACK_plot_long$StartEndVisit), " (n = ", count(TRACK_plot_long, StartEndVisit)$n, ")")) +
+  scale_y_continuous(name = "Proportion") +
+  scale_fill_manual(name = "Asthma attacks in the past 12 months", values = gv_long$ISAACa02$Colors) +
   cutie_layer(title = "Proportion of patients that had asthma attacks in the past 12 months")
-
+# Plot asthma attacks over time (number)
+TRACK_plot_long %>% 
+  subset(!is.na(ISAACa03)) %>% 
+  unite(DayGroup, c(StartEndVisit, V1_Rand_RandGroup), remove = F) %>%
+  mutate(DayGroup = factor(DayGroup, levels = as.vector(sapply(X = c("Day0_", "Day360_", "Day540_", "Day720_"), FUN = paste0, c("UsualCare", "Intervention"))))) %>%
+  ggplot(aes(x = DayGroup, fill = as.factor(ISAACa03))) +
+    geom_bar(position = "fill") +
+    # stat_summary(mapping = aes(label = after_stat(..y..)), geom = "label", position = position_fill(vjust = .5), show.legend = F) +
+    scale_x_discrete(name = "TEST", labels = as.vector(sapply(X = c("Day 0, ", "Day 360, ", "Day 540, ", "Day 720, "), FUN = paste0, c("UsualCare", "Intervention")))) +
+    scale_y_continuous(name = "Number of asthma attacks in the past 12 months") +
+    # scale_fill_manual(name = "test", labels = ) +
+    cutie_layer(title = "Number of asthma attacks in the past 12 months")
 # Wide-format plots
 TRACK_plot_wide = TRACK_wide
 TRACK_plot_wide = subset(TRACK_plot_wide, !is.na(V1_Rand_RandGroup))
 TRACK_plot_wide = subset(TRACK_plot_wide, !is.na(V1_Rand_BreathResult))
+gv_wide = makeGroupValues(TRACK_plot_wide, "wide")
 
+# Direct and indirect costs per group
+ggplot(data = TRACK_plot_wide %>% pivot_longer(cols = c("DirectCost", "IndirectCost"), names_to = "SourceCost", values_to = "Cost"), aes(x = V1_Rand_RandGroup, y = Cost, fill = SourceCost, linetype = SourceCost)) +
+  geom_boxplot() +
+  stat_summary(mapping = aes(label = euro_label(..y..)), fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
+  scale_x_discrete(name = gv_wide$V1_Rand_RandGroup$name, labels = gv_wide$V1_Rand_RandGroup$labels) +
+  scale_y_continuous(name = "Total cost", labels = euro_label) +
+  scale_fill_manual(name = gv_wide$HCSRU$name, labels = gv_wide$HCSRU$labels, values = gv_wide$HCSRU$Colors) +
+  scale_linetype_manual(name = gv_wide$HCSRU$name, labels = gv_wide$HCSRU$labels, values = gv_wide$HCSRU$LineType) +
+  cutie_layer(title = "Difference in direct and indirect costs to family and healthcare system per patient")
 
-# Past asthma attacks over time
-
-customggsave(plot)
+# Save
+customggsave(plot, name = "track difference over time experimental group")
 
 ## Statistical tests ----
 # Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
