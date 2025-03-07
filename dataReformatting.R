@@ -372,14 +372,14 @@ makeGroupValues = function(df, format){
     
     if ("ISAACa02" %in% colnames(df)){
       group_values$ISAACa02 = list(name = "Previous asthma attacks",
-                                   labels = paste0(c("Yes (n =", "No (n ="), (df %>% subset(!is.na(ISAACa02)) %>% count(ISAACa02))$n, ")"),
+                                   labels = paste0(c("Yes (n = ", "No (n = "), (df %>% subset(!is.na(ISAACa02)) %>% count(ISAACa02))$n, ")"),
                                    Colors = c("#B2C900", "#4D36FF"), 
                                    LineType = c("solid", "longdash"))
     }
     if ("ISAACa03" %in% colnames(df)){
-      colramp <- colorRampPalette(c("lightgray", "red"))
+      colramp <- colorRampPalette(c("lightgray", "black"))
       group_values$ISAACa03 = list(name = "Number of previous asthma attacks",
-                                   labels = paste0((df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$ISAACa03, " (n =", (df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$n, ")"),
+                                   labels = paste0((df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$ISAACa03, " (n = ", (df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$n, ")"),
                                    Colors = colramp(df %>% subset(!is.na(ISAACa03)) %>% .$ISAACa03 %>% unique %>% length), 
                                    LineType = c("solid", "longdash"))
     }
@@ -445,8 +445,9 @@ TRACK_plot_long %>%
     # stat_summary(mapping = aes(label = after_stat(..y..)), geom = "label", position = position_fill(vjust = .5), show.legend = F) +
     scale_x_discrete(name = "TEST", labels = as.vector(sapply(X = c("Day 0, ", "Day 360, ", "Day 540, ", "Day 720, "), FUN = paste0, c("UsualCare", "Intervention")))) +
     scale_y_continuous(name = "Number of asthma attacks in the past 12 months") +
-    # scale_fill_manual(name = "test", labels = ) +
+    scale_fill_manual(name = gv_long$ISAACa03$name, labels = gv_long$ISAACa03$labels, values = gv_long$ISAACa03$Colors) +
     cutie_layer(title = "Number of asthma attacks in the past 12 months")
+
 # Wide-format plots
 TRACK_plot_wide = TRACK_wide
 TRACK_plot_wide = subset(TRACK_plot_wide, !is.na(V1_Rand_RandGroup))
