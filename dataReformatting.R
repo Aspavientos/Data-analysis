@@ -360,7 +360,7 @@ cutie_layer = function(title, subtitle = NULL) {
 makeGroupValues = function(df, format){
   if (format == "long"){
     group_values = list(Days = list(name = "Day of visit (± 90 days)",
-                                    labels = paste0(gsub("([0-9]+){1}", " \\1", levels(df$StartEndVisit)), " (n = ", count(df, StartEndVisit)$n, ")")),
+                                    labels = paste0(gsub("([0-9]+){1}", " \\1", count(df, StartEndVisit)$StartEndVisit), " (n = ", count(df, StartEndVisit)$n, ")")),
                         V1_Rand_BreathResult = list(name = "Breath test results",
                                                     labels = paste0(c("Transient Wheeze (n = ", "Asthma (n = "), (df %>% subset(!is.na(V1_Rand_BreathResult)) %>% count(V1_Rand_BreathResult))$n, ")"),
                                                     Colors = c("#00BFC4", "#F8766D"),
@@ -369,19 +369,24 @@ makeGroupValues = function(df, format){
                                                  labels = paste0(c("Control (n = ", "Intervention (n = "), (df %>% subset(!is.na(V1_Rand_RandGroup)) %>% count(V1_Rand_RandGroup))$n, ")"),
                                                  Colors = c("#7CAE00","#C77CFF"),
                                                  LineType = c("solid", "longdash")))
+    names(group_values$Days$labels) = count(df, StartEndVisit)$StartEndVisit
+    names(group_values$V1_Rand_BreathResult$labels) = levels(df$V1_Rand_BreathResult)
+    names(group_values$V1_Rand_RandGroup$labels) = levels(df$V1_Rand_RandGroup)
     
     if ("ISAACa02" %in% colnames(df)){
       group_values$ISAACa02 = list(name = "Previous asthma attacks",
                                    labels = paste0(c("Yes (n = ", "No (n = "), (df %>% subset(!is.na(ISAACa02)) %>% count(ISAACa02))$n, ")"),
-                                   Colors = c("#B2C900", "#4D36FF"), 
+                                   Colors = c("pink", "red3"), 
                                    LineType = c("solid", "longdash"))
+      names(group_values$ISAACa02$labels) = levels(df$ISAACa02)
     }
     if ("ISAACa03" %in% colnames(df)){
-      colramp <- colorRampPalette(c("lightgray", "black"))
+      colramp <- colorRampPalette(c("pink", "red3"))
       group_values$ISAACa03 = list(name = "Number of previous asthma attacks",
                                    labels = paste0((df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$ISAACa03, " (n = ", (df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$n, ")"),
                                    Colors = colramp(df %>% subset(!is.na(ISAACa03)) %>% .$ISAACa03 %>% unique %>% length), 
                                    LineType = c("solid", "longdash"))
+      names(group_values$ISAACa03$labels) = levels(df$ISAACa03)
     }
     
     if (any(grepl("Cost", colnames(TRACK_plot_long), ignore.case = T))){
@@ -401,12 +406,16 @@ makeGroupValues = function(df, format){
                                                  LineType = c("solid", "longdash")),
                         ISAACa02 = list(name = "Previous asthma attacks",
                                         labels = c("Yes", "No"),
-                                        Colors = c("#B2C900", "#4D36FF"), 
+                                        Colors = c("pink", "red3"), 
                                         LineType = c("solid", "longdash")),
                         HCSRU = list(name = "Type of cost",
                                      labels = c("Direct", "Indirect"),
                                      Colors = c("#487FFF", "#B78000"),
                                      LineType = c("solid", "longdash")))
+    names(group_values$Days$labels) = levels(df$StartEndVisit)
+    names(group_values$V1_Rand_BreathResult$labels) = levels(df$V1_Rand_BreathResult)
+    names(group_values$V1_Rand_RandGroup$labels) = levels(df$V1_Rand_RandGroup)
+    
   }
   return(group_values)
 }
@@ -429,24 +438,33 @@ ggplot(data = subset(TRACK_plot_long, !(StartEndVisit %in% "Day0")), aes(x = Sta
   scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType) +
   cutie_layer(title = "Difference in TRACK score compared to baseline")
 # Plot asthma attacks over time (yes/no)
-ggplot(data = subset(TRACK_plot_long, !is.na(ISAACa02)), aes(x = StartEndVisit, fill = ISAACa02)) +
-  geom_bar(color = "black", linewidth = 1, position = "fill") + 
-  scale_x_discrete(name = "Day of visit (± 90 days)", labels = paste0(levels(TRACK_plot_long$StartEndVisit), " (n = ", count(TRACK_plot_long, StartEndVisit)$n, ")")) +
-  scale_y_continuous(name = "Proportion") +
-  scale_fill_manual(name = "Asthma attacks in the past 12 months", values = gv_long$ISAACa02$Colors) +
+TRACK_plot_long %>% 
+  subset(!is.na(ISAACa02)) %>% 
+  subset(!(StartEndVisit %in% c("Day180","Day540"))) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, fill = ISAACa02, color = V1_Rand_RandGroup, linetype = V1_Rand_RandGroup)) +
+  geom_bar(linewidth = 1, position = "fill") +
+  scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
+  scale_y_continuous(name = "Proportion", labels = percent) +
+  scale_fill_manual(name = gv_long$ISAACa02$name, labels = gv_long$ISAACa02$labels, values = gv_long$ISAACa02$Colors) +
+  scale_color_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$Colors, guide = "none") + 
+  scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType, guide = "none") +  
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Days$labels)) +
   cutie_layer(title = "Proportion of patients that had asthma attacks in the past 12 months")
+
 # Plot asthma attacks over time (number)
 TRACK_plot_long %>% 
   subset(!is.na(ISAACa03)) %>% 
-  unite(DayGroup, c(StartEndVisit, V1_Rand_RandGroup), remove = F) %>%
-  mutate(DayGroup = factor(DayGroup, levels = as.vector(sapply(X = c("Day0_", "Day360_", "Day540_", "Day720_"), FUN = paste0, c("UsualCare", "Intervention"))))) %>%
-  ggplot(aes(x = DayGroup, fill = as.factor(ISAACa03))) +
-    geom_bar(position = "fill") +
-    # stat_summary(mapping = aes(label = after_stat(..y..)), geom = "label", position = position_fill(vjust = .5), show.legend = F) +
-    scale_x_discrete(name = "TEST", labels = as.vector(sapply(X = c("Day 0, ", "Day 360, ", "Day 540, ", "Day 720, "), FUN = paste0, c("UsualCare", "Intervention")))) +
-    scale_y_continuous(name = "Number of asthma attacks in the past 12 months") +
+  subset(!(StartEndVisit %in% c("Day180","Day540"))) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, fill = as.factor(ISAACa03), color = V1_Rand_RandGroup, linetype = V1_Rand_RandGroup)) +
+    geom_bar(linewidth = 1, position = "fill") +
+    geom_text(aes(label = after_stat(count)), stat = "count", position = position_fill(vjust = .5), color = "black") + 
+    scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
+    scale_y_continuous(name = "Proportion", labels = percent) +
     scale_fill_manual(name = gv_long$ISAACa03$name, labels = gv_long$ISAACa03$labels, values = gv_long$ISAACa03$Colors) +
-    cutie_layer(title = "Number of asthma attacks in the past 12 months")
+    scale_color_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$Colors, guide = "none") + 
+    scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType, guide = "none") +  
+    facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Days$labels)) +
+    cutie_layer(title = "Distribution of patients according to the amount of asthma attacks in the past 12 months")
 
 # Wide-format plots
 TRACK_plot_wide = TRACK_wide
@@ -465,7 +483,7 @@ ggplot(data = TRACK_plot_wide %>% pivot_longer(cols = c("DirectCost", "IndirectC
   cutie_layer(title = "Difference in direct and indirect costs to family and healthcare system per patient")
 
 # Save
-customggsave(plot, name = "track difference over time experimental group")
+customggsave(plot, name = "previous asthma attacks per experimental group")
 
 ## Statistical tests ----
 # Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
