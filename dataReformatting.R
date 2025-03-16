@@ -257,7 +257,7 @@ startend_reformat = function(survey_df, patient_df, format, extraSurvey_list = N
     surveypatient_df$DaysSince1stVisit = 0
     #surveypatient_df$DayBin = "Start"
     for (i in 1:length(startends)){
-      if (startends[i] != "Day 0"){
+      if (startends[i] != "Day0"){
         temp_df = merge(template_df, survey_df[survey_df$StartEndVisit %in% startends[i], c("Participant.Id", "TRACKSUM", "DaysSince1stVisit", "StartEndVisit")])
         colnames(temp_df)[colnames(temp_df) == "TRACKSUM"] = "TRACKSUM_End"
         #colnames(surveypatient_df)[colnames(surveypatient_df) == "DaysSince1stVisit"] = paste0("VisitDay", startends[i])
@@ -321,7 +321,7 @@ startend_reformat = function(survey_df, patient_df, format, extraSurvey_list = N
     if(any(names(extraSurvey_list$df) %in% "HCSRU")){
       HCSRU_qs = extraSurvey_list$qs$HCSRU
       HCSRU_se = extraSurvey_list$df$HCSRU
-      
+
       if(format == "long"){
         surveypatient_df = merge(surveypatient_df, HCSRU_se[, c("Participant.Id", "StartEndVisit", "DirectCost", "IndirectCost")])
       }else{
@@ -383,7 +383,7 @@ makeGroupValues = function(df, format){
                         V1_Rand_BreathResult = list(name = "Breath test results",
                                                     labels = paste0(c("Transient Wheeze (n = ", "Asthma (n = "), (df %>% subset(!is.na(V1_Rand_BreathResult)) %>% distinct(Participant.Id, .keep_all = T) %>% count(V1_Rand_BreathResult))$n, ")"),
                                                     labelsabr = c("Transient Wheeze", "Asthma"),
-                                                    Colors = c("#00BFC4", "#F8766D"),
+                                                    Colors = c("#53f9ff", "#F8766D"),
                                                     LineType = c("solid", "longdash")),
                         V1_Rand_RandGroup = list(name = "Experimental group",
                                                  labels = paste0(c("Control (n = ", "Intervention (n = "), (df %>% subset(!is.na(V1_Rand_RandGroup)) %>% distinct(Participant.Id, .keep_all = T) %>% count(V1_Rand_RandGroup))$n, ")"),
@@ -394,14 +394,14 @@ makeGroupValues = function(df, format){
     
     if ("ISAACa02" %in% colnames(df)){
       group_values$ISAACa02 = list(name = "Previous asthma attacks",
-                                   labels = paste0(c("Yes (n = ", "No (n = "), (df %>% subset(!is.na(ISAACa02)) %>% count(ISAACa02))$n, ")"),
-                                   labelsabr = c("Yes", "No"),
-                                   Colors = c("pink", "red3"), 
+                                   labels = paste0(c("No (n = ", "Yes (n = "), (df %>% subset(!is.na(ISAACa02)) %>% count(ISAACa02))$n, ")"),
+                                   labelsabr = c("No", "Yes"),
+                                   Colors = c("pink", "firebrick1"), 
                                    LineType = c("solid", "longdash"))
       names(group_values$ISAACa02$labels) = levels(df$ISAACa02)
     }
     if ("ISAACa03" %in% colnames(df)){
-      colramp <- colorRampPalette(c("pink", "red3"))
+      colramp <- colorRampPalette(c("pink", "firebrick1"))
       group_values$ISAACa03 = list(name = "Number of previous asthma attacks",
                                    labels = paste0((df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$ISAACa03, " attacks (n = ", (df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$n, ")"),
                                    labelsabr = (df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$ISAACa03,
@@ -426,11 +426,11 @@ makeGroupValues = function(df, format){
                         V1_Rand_RandGroup = list(name = "Experimental group",
                                                  labels = paste0(c("Control (n = ", "Intervention (n = "), (df %>% subset(!is.na(V1_Rand_RandGroup)) %>% count(V1_Rand_RandGroup))$n, ")"),
                                                  labelsabr = c("Control", "Intervention"),
-                                                 Colors = c("#7CAE00","#C77CFF"),
+                                                 Colors = c("#b5da5a","#c16cff"),
                                                  LineType = c("solid", "longdash")),
                         ISAACa02 = list(name = "Previous asthma attacks",
-                                        labels = c("Yes", "No"),
-                                        Colors = c("pink", "red3"), 
+                                        labels = c("No", "Yes"),
+                                        Colors = c("pink", "firebrick1"), 
                                         LineType = c("solid", "longdash")),
                         HCSRU = list(name = "Type of cost",
                                      labels = c("Direct cost", "Indirect cost"),
@@ -464,25 +464,27 @@ ann_text = list()
 # TRACK score differences over time
 TRACK_plot_long %>%
   subset(!(StartEndVisit %in% "Day0")) %>%
-  ggplot(aes(x = V1_Rand_BreathResult, y = TRACKSUM_Diff, fill = V1_Rand_BreathResult, linetype = V1_Rand_BreathResult)) +
-    geom_boxplot() +
+  ggplot(aes(x = V1_Rand_RandGroup, y = TRACKSUM_Diff, fill = V1_Rand_RandGroup)) +
+    #geom_boxplot() +
+    geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, pattern = "circle", pattern_fill = "white", show.legend = F) +
     stat_summary(mapping = aes(label = ..y..), fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
-    scale_x_discrete(name = gv_long$V1_Rand_BreathResult$name, labels = gv_long$V1_Rand_BreathResult$labelsabr) +
+    scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labelsabr) +
     scale_y_continuous(name = "Difference in TRACK score") +
-    scale_fill_manual(name = gv_long$V1_Rand_BreathResult$name, labels = gv_long$V1_Rand_BreathResult$labels, values = gv_long$V1_Rand_BreathResult$Colors) +
-    scale_linetype_manual(name = gv_long$V1_Rand_BreathResult$name, labels = gv_long$V1_Rand_BreathResult$labels, values = gv_long$V1_Rand_BreathResult$LineType) +
+    scale_fill_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$Colors) +
+    scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType) +
     facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Days$labels), strip.position = "bottom") +  
-    cutie_layer(title = "Difference in TRACK score compared to baseline")
+    cutie_layer(title = "Difference in TRACK score compared to Day 0", subtitle = "Comparison between experimental groups")
+
 # TRACK score differences with both groupings
 ann_text$TF_RG_BR_SE = TRACK_plot_long %>%
   subset(!(StartEndVisit %in% "Day0")) %>%
   count(StartEndVisit, V1_Rand_BreathResult, V1_Rand_RandGroup)
 
-plot = TRACK_plot_long %>%
+TRACK_plot_long %>%
   subset(!(StartEndVisit %in% "Day0")) %>%
   ggplot(aes(x = V1_Rand_RandGroup, y = TRACKSUM_Diff, fill = V1_Rand_RandGroup)) +
   #geom_boxplot() +
-  geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, pattern = "circle", pattern_fill = "white", show.legend = F) +
+  geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
   geom_text(data = ann_text$TF_RG_BR_SE, mapping = aes(y = -Inf, label = paste("n =", n)), vjust = -.5) + 
   stat_summary(mapping = aes(label = ..y..), fill = "white", fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
   scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labelsabr) +
@@ -490,22 +492,22 @@ plot = TRACK_plot_long %>%
   scale_fill_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$Colors) +
   scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType) +
   facet_grid(V1_Rand_BreathResult~StartEndVisit, labeller = labeller(StartEndVisit = gv_long$Days$labels, V1_Rand_BreathResult = gv_long$V1_Rand_BreathResult$labels)) +  
-  cutie_layer(title = "Difference in TRACK score compared to baseline")
+  cutie_layer(title = "Difference in TRACK score compared to Day 0", subtitle = "Comparison between experimental groups, separated by breath test result")
 
 # Plot asthma attacks over time (yes/no)
 TRACK_plot_long %>% 
   subset(!is.na(ISAACa02)) %>% 
   subset(!(StartEndVisit %in% c("Day180","Day540"))) %>%
   ggplot(aes(x = V1_Rand_RandGroup, fill = ISAACa02)) +
-  geom_bar_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, position = position_fill(reverse = T), pattern = "circle", pattern_fill = "white") +
-  scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
-  scale_y_continuous(name = "Proportion", labels = percent) +
-  scale_fill_manual(name = gv_long$ISAACa02$name, labels = gv_long$ISAACa02$labels, values = gv_long$ISAACa02$Colors) +
-  scale_color_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$Colors, guide = "none") + 
-  scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType, guide = "none") +  
-  scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +
-  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Days$labels)) +
-  cutie_layer(title = "Proportion of patients that had asthma attacks in the past 12 months")
+    geom_bar_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, position = position_fill(reverse = T), pattern = "circle", pattern_fill = "white") +
+    geom_label(aes(label = after_stat(count)), stat = "count", position = position_fill(reverse = T, vjust = .5), color = "black", show.legend = F) +
+    scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
+    scale_y_continuous(name = "Proportion", labels = label_percent()) +
+    scale_fill_manual(name = gv_long$ISAACa02$name, labels = gv_long$ISAACa02$labelsabr, values = gv_long$ISAACa02$Colors) +
+    scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType, guide = "none") +  
+    scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +
+    facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Days$labels), strip.position = "bottom") +
+    cutie_layer(title = "Proportion of patients that had asthma attacks in the past 12 months")
 
 # Plot asthma attacks over time (number)
 ann_text$SE_I3 = TRACK_plot_long %>% 
@@ -521,11 +523,14 @@ TRACK_plot_long %>%
     geom_label(aes(label = after_stat(count)), stat = "count", position = position_fill(reverse = T, vjust = .5), color = "black", show.legend = F) + 
     scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
     scale_y_continuous(name = "Proportion", labels = percent) +
-    scale_fill_manual(name = gv_long$ISAACa03$name, labels = gv_long$ISAACa03$labels, values = gv_long$ISAACa03$Colors) +
+    scale_fill_manual(name = gv_long$ISAACa03$name, labels = gv_long$ISAACa03$labelsabr, values = gv_long$ISAACa03$Colors) +
     scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType, guide = "none") +  
     scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +  
     facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Days$labels), strip.position = "bottom") +
     cutie_layer(title = "Distribution of patients according to the amount of asthma attacks in the past 12 months")
+
+# Box-plot number of asthma attacks
+
 
 # Wide-format plots
 TRACK_plot_wide = TRACK_wide
@@ -560,7 +565,7 @@ TRACK_plot_wide %>%
   cutie_layer(title = "Distribution of direct and indirect costs across patients")
 
 # Save
-customggsave(plot, upscale = 2, name = "track difference over time both groupings")
+customggsave(plot, upscale = 2, name = "number of previous asthma attacks per experimental group")
 
 ## Statistical tests ----
 # Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
