@@ -140,11 +140,16 @@ HCSRU_sub$IndirectCost = as.numeric(as.matrix(HCSRU_sub[, HCSRU_qs$questions[HCS
 colnames(HCSRU_sub)[colnames(HCSRU_sub) %in% "Castor.Participant.ID"] = "Participant.Id"
 
 ## Cleaning TAPQOL survey ----
-TAPQOL_qs = list(questions = c("TAPQOL06a", "TAPQOL07a"),
-                 vartype = c("factor", "factor"),
+TAPQOL_qs = list(questions = c("TAPQOL06a", "TAPQOL06b", "TAPQOL07a", "TAPQOL07b"),
+                 vartype = c("factor", "factor", "factor", "factor"),
                  levels = list(c("Never", "Sometimes", "Often"), c("Good", "Not so good", "Pretty bad", "Bad"), c("Never", "Sometimes", "Often"), c("Good", "Not so good", "Pretty bad", "Bad")))
 
+names(TAPQOL_qs$levels) = TAPQOL_qs$questions
 
+TAPQOL_sub = surveys$TAPQOL[,c("Castor.Participant.ID","Survey.Creation.Date","Survey.Package.Name", TAPQOL_qs$questions)]
+
+TAPQOL_sub$Survey.Package.Name = t(as.data.frame(str_split(TAPQOL_sub$Survey.Package.Name, " : ")))[,2]
+colnames(TAPQOL_sub)[colnames(TAPQOL_sub) %in% "Castor.Participant.ID"] = "Participant.Id"
 
 # Replicating Moniek's analysis ----
 date_options = list(day_bwidth = 90,
@@ -248,6 +253,7 @@ startend_analysis = function(TRACK_merge, date_options){
 TRACK_merge_se = startend_analysis(TRACK_merge, date_options)
 ISAAC_se = startend_analysis(ISAAC_sub, date_options)
 HCSRU_se = startend_analysis(HCSRU_sub, date_options)
+TAPQOL_se = startend_analysis(TAPQOL_sub, date_options)
 
 # Data frame with one row per patient, only first and last visit
 startend_reformat = function(survey_df, patient_df, format, extraSurvey_list = NULL){
@@ -339,15 +345,45 @@ startend_reformat = function(survey_df, patient_df, format, extraSurvey_list = N
         }
       }
     }
+    
+    # TAPQOL mathcing
+    if(any(names(extraSurvey_list$df) %in% "TAPQOL")){
+      TAPQOL_qs = extraSurvey_list$qs$TAPQOL
+      TAPQOL_se = extraSurvey_list$df$TAPQOL
+      TAPQOL_se = TAPQOL_se[!is.na(TAPQOL_se$StartEndVisit),]
+      
+      if(format == "long"){
+        surveypatient_df = merge(surveypatient_df, TAPQOL_se[, c("Participant.Id", "StartEndVisit", TAPQOL_qs$questions)])
+        for (k in 1:length(TAPQOL_qs$questions)){
+          qcurrent = strsplit(TAPQOL_qs$questions[k], "(TAPQOL)")[[1]][2]
+          if(str_detect(qcurrent, "a")){
+            qother = str_detect(TAPQOL_qs$questions, paste0(str_extract(qcurrent, "[0-9]{2}"), "b"))
+            #surveypatient_df[surveypatient_df[,TAPQOL_qs$questions[k]] == 0 | is.na(surveypatient_df[,TAPQOL_qs$questions[k]]),TAPQOL_qs$questions[qother]] = 1
+            #surveypatient_df[is.na(surveypatient_df[,TAPQOL_qs$questions[k]]),TAPQOL_qs$questions[qother]] = NA
+          }
+          if (TAPQOL_qs$vartype[k] == "factor"){
+            surveypatient_df[,TAPQOL_qs$questions[k]] = as.factor(surveypatient_df[,TAPQOL_qs$questions[k]])
+            levels(surveypatient_df[,TAPQOL_qs$questions[k]]) = TAPQOL_qs$levels[[k]]
+          }
+        }
+      }else{
+        # WIP
+      }
+      
+    }
   }
   
   return(surveypatient_df)
 }
 
 extrasurveylist = list(df = list(#ISAAC = ISAAC_se,
-                                 HCSRU = HCSRU_se),
+                                 #HCSRU = HCSRU_se,
+                                 TAPQOL = TAPQOL_se
+                                 ),
                        qs = list(#ISAAC = ISAAC_qs,
-                                 HCSRU = HCSRU_qs))
+                                 #HCSRU = HCSRU_qs,
+                                 TAPQOL = TAPQOL_qs
+                                 ))
 
 TRACK_long = startend_reformat(TRACK_merge_se, ADEM2_sub, format = "long", extraSurvey_list = extrasurveylist)
 TRACK_wide = startend_reformat(TRACK_merge_se, ADEM2_sub, format = "wide", extraSurvey_list = extrasurveylist)
@@ -569,6 +605,29 @@ TRACK_plot_long %>%
   cutie_layer(title = "Proportion of patients with symptoms under control")
 
 # customggsave(plot, upscale = 2, name = "proportion of patients under control", save_path = "/TRACK/")
+
+### Quality of life ----
+ann_text$QOL_6a = TRACK_plot_long %>% 
+  subset(!is.na(TAPQOL06a)) %>% 
+  count(StartEndVisit, V1_Rand_RandGroup, TAPQOL06a) %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  mutate(pct = n/sum(n))
+
+TRACK_plot_long %>% 
+  subset(!is.na(TAPQOL06a)) %>% 
+  ggplot(aes(x = V1_Rand_RandGroup, fill = TAPQOL06a)) +
+  geom_bar_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, position = position_fill(reverse = T), pattern = "circle", pattern_fill = "white") +
+  geom_label(data = ann_text$QOL_6a, aes(y = pct, label = label_percent(1)(pct)), position = position_fill(reverse = T, vjust = .5), color = "black", fill = "white", show.legend = F) +   
+  #geom_label(aes(label = after_stat(count)), stat = "count", position = position_fill(reverse = T, vjust = .5), color = "black", show.legend = F) + 
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
+  scale_y_continuous(name = "Proportion", labels = percent) +
+  scale_fill_manual(name = gv_long$Base$ISAACa03$name, labels = gv_long$Base$ISAACa03$labelsabr, values = gv_long$Base$ISAACa03$Colors) +
+  scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +  
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Distribution of patients according to the amount of asthma attacks in the previous 12 months")
+
+# customggsave(plot, upscale = 2, name = "distribution of QOL per group", save_path = "/TAPQOL/")
+
 
 ### Plot asthma attacks over time (yes/no) ----
 ann_text$SE_I2 = TRACK_plot_long %>% 
