@@ -139,6 +139,13 @@ HCSRU_sub$IndirectCost = as.numeric(as.matrix(HCSRU_sub[, HCSRU_qs$questions[HCS
 
 colnames(HCSRU_sub)[colnames(HCSRU_sub) %in% "Castor.Participant.ID"] = "Participant.Id"
 
+## Cleaning TAPQOL survey ----
+TAPQOL_qs = list(questions = c("TAPQOL06a", "TAPQOL07a"),
+                 vartype = c("factor", "factor"),
+                 levels = list(c("Never", "Sometimes", "Often"), c("Good", "Not so good", "Pretty bad", "Bad"), c("Never", "Sometimes", "Often"), c("Good", "Not so good", "Pretty bad", "Bad")))
+
+
+
 # Replicating Moniek's analysis ----
 date_options = list(day_bwidth = 90,
                     days = c(0, 180, 360, 520),
@@ -337,16 +344,15 @@ startend_reformat = function(survey_df, patient_df, format, extraSurvey_list = N
   return(surveypatient_df)
 }
 
-extrasurveylist = list(df = list(ISAAC = ISAAC_se,
+extrasurveylist = list(df = list(#ISAAC = ISAAC_se,
                                  HCSRU = HCSRU_se),
-                       qs = list(ISAAC = ISAAC_qs,
+                       qs = list(#ISAAC = ISAAC_qs,
                                  HCSRU = HCSRU_qs))
 
 TRACK_long = startend_reformat(TRACK_merge_se, ADEM2_sub, format = "long", extraSurvey_list = extrasurveylist)
 TRACK_wide = startend_reformat(TRACK_merge_se, ADEM2_sub, format = "wide", extraSurvey_list = extrasurveylist)
 
-# Tests and plots ----
-## Plots ----
+# Plots ----
 # Remove NAs
 # Combine columns for plots
 
@@ -385,12 +391,20 @@ makeGroupValues = function(df, format){
                                                     labelsabr = c("Transient Wheeze", "Asthma"),
                                                     Colors = c("#53f9ff", "#F8766D"),
                                                     LineType = c("solid", "longdash")),
-                        V1_Rand_RandGroup = list(name = "Experimental group",
+                        V1_Rand_RandGroup = list(name = "Group",
                                                  labels = paste0(c("Control (n = ", "Intervention (n = "), (df %>% subset(!is.na(V1_Rand_RandGroup)) %>% distinct(Participant.Id, .keep_all = T) %>% count(V1_Rand_RandGroup))$n, ")"),
                                                  labelsabr = c("Control", "Intervention"),
                                                  Colors = c("#b5da5a","#c16cff"),
                                                  LineType = c("solid", "longdash")))
     names(group_values$Days$labels) = count(df, StartEndVisit)$StartEndVisit
+    
+    if("UnderControl" %in% colnames(df)){
+      group_values$Undercontrol = list(name = "Symptoms under control",
+                                       labels = c("No", "Yes"),
+                                       color = c("olivedrab1", "olivedrab"))
+      names(group_values$Undercontrol$labels) = c("FALSE", "TRUE")
+    }
+    
     
     if ("ISAACa02" %in% colnames(df)){
       group_values$ISAACa02 = list(name = "Previous asthma attacks",
@@ -408,6 +422,33 @@ makeGroupValues = function(df, format){
                                    Colors = colramp(df %>% subset(!is.na(ISAACa03)) %>% .$ISAACa03 %>% unique %>% length), 
                                    LineType = c("solid", "longdash"))
       names(group_values$ISAACa03$labels) = levels(df$ISAACa03)
+    }
+    
+    if ("NonZeroTotal" %in% colnames(df)){
+      group_values$NonZeroTotal = list(name = "Patients with non-zero total costs",
+                                   #labels = paste0((df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$ISAACa03, " attacks (n = ", (df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$n, ")"),
+                                   labelsabr = c("Zero costs", "Non-zero costs"),
+                                   Colors = c("cadetblue1", "deepskyblue1"), 
+                                   LineType = c("solid", "longdash"))
+      names(group_values$NonZeroTotal$labels) = c("FALSE", "TRUE")
+    }
+    
+    if ("NonZeroDirect" %in% colnames(df)){
+      group_values$NonZeroDirect = list(name = "Patients with non-zero direct costs",
+                                       #labels = paste0((df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$ISAACa03, " attacks (n = ", (df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$n, ")"),
+                                       labelsabr = c("Zero costs", "Non-zero costs"),
+                                       Colors = c("cadetblue1", "deepskyblue1"), 
+                                       LineType = c("solid", "longdash"))
+      names(group_values$NonZeroDirect$labels) = c("FALSE", "TRUE")
+    }
+    
+    if ("NonZeroIndirect" %in% colnames(df)){
+      group_values$NonZeroIndirect = list(name = "Patients with non-zero indirect costs",
+                                        #labels = paste0((df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$ISAACa03, " attacks (n = ", (df %>% subset(!is.na(ISAACa03)) %>% count(ISAACa03))$n, ")"),
+                                        labelsabr = c("Zero costs", "Non-zero costs"),
+                                        Colors = c("cadetblue1", "deepskyblue1"), 
+                                        LineType = c("solid", "longdash"))
+      names(group_values$NonZeroIndirect$labels) = c("FALSE", "TRUE")
     }
     
     if (any(grepl("Cost", colnames(df), ignore.case = T))){
@@ -452,106 +493,426 @@ make_labels = function(data, labelfor){
   }
 }
                     
-euro_label = label_currency(accuracy = 1, prefix = "", suffix = " €", big.mark = ".", decimal.mark = ",")
+euro_label = label_currency(accuracy = 1, scale = 1, prefix = "", suffix = " €", big.mark = ".", decimal.mark = ",")
 
-# Long-format plots
+euro_label_thousand = label_currency(accuracy = 1, scale = 1/1000, prefix = "", suffix = "k €", big.mark = ".", decimal.mark = ",")
+
+## Long-format plots ----
 TRACK_plot_long = TRACK_long
 TRACK_plot_long = subset(TRACK_plot_long, !is.na(V1_Rand_RandGroup))
 TRACK_plot_long = subset(TRACK_plot_long, !is.na(V1_Rand_BreathResult))
-gv_long = makeGroupValues(TRACK_plot_long, "long")
+gv_long = list()
 ann_text = list()
 
-# TRACK score differences over time
+### TRACK score differences over time ----
+gv_long$Base = TRACK_plot_long %>%
+  makeGroupValues("long")
+
 TRACK_plot_long %>%
   subset(!(StartEndVisit %in% "Day0")) %>%
-  ggplot(aes(x = V1_Rand_RandGroup, y = TRACKSUM_Diff, fill = V1_Rand_RandGroup)) +
+  ggplot(aes(x = V1_Rand_BreathResult, y = TRACKSUM_Diff, fill = V1_Rand_BreathResult)) +
     #geom_boxplot() +
-    geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, pattern = "circle", pattern_fill = "white", show.legend = F) +
+    geom_boxplot_pattern(aes(pattern_density = V1_Rand_BreathResult), color = "black", linewidth = 1, pattern = "circle", pattern_fill = "white", show.legend = F) +
     stat_summary(mapping = aes(label = ..y..), fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
-    scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labelsabr) +
+    scale_x_discrete(name = gv_long$Base$V1_Rand_BreathResult$name, labels = gv_long$Base$V1_Rand_BreathResult$labelsabr) +
     scale_y_continuous(name = "Difference in TRACK score") +
-    scale_fill_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$Colors) +
-    scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType) +
-    facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Days$labels), strip.position = "bottom") +  
+    scale_fill_manual(name = gv_long$Base$V1_Rand_BreathResult$name, labels = gv_long$Base$V1_Rand_BreathResult$labels, values = gv_long$Base$V1_Rand_BreathResult$Colors) +
+    scale_linetype_manual(name = gv_long$Base$V1_Rand_BreathResult$name, labels = gv_long$Base$V1_Rand_BreathResult$labels, values = gv_long$Base$V1_Rand_BreathResult$LineType) +
+    facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +  
     cutie_layer(title = "Difference in TRACK score compared to Day 0", subtitle = "Comparison between experimental groups")
 
-# TRACK score differences with both groupings
+# customggsave(plot, upscale = 2, name = "track difference over time group", save_path = "/TRACK/")
+# customggsave(plot, upscale = 2, name = "track difference over time breathresult", save_path = "/TRACK/")
+
+### TRACK score differences with both groupings ----
 ann_text$TF_RG_BR_SE = TRACK_plot_long %>%
   subset(!(StartEndVisit %in% "Day0")) %>%
   count(StartEndVisit, V1_Rand_BreathResult, V1_Rand_RandGroup)
 
-TRACK_plot_long %>%
+plot = TRACK_plot_long %>%
   subset(!(StartEndVisit %in% "Day0")) %>%
   ggplot(aes(x = V1_Rand_RandGroup, y = TRACKSUM_Diff, fill = V1_Rand_RandGroup)) +
   #geom_boxplot() +
   geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
   geom_text(data = ann_text$TF_RG_BR_SE, mapping = aes(y = -Inf, label = paste("n =", n)), vjust = -.5) + 
   stat_summary(mapping = aes(label = ..y..), fill = "white", fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
-  scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labelsabr) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
   scale_y_continuous(name = "Difference in TRACK score") +
-  scale_fill_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$Colors) +
-  scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType) +
-  facet_grid(V1_Rand_BreathResult~StartEndVisit, labeller = labeller(StartEndVisit = gv_long$Days$labels, V1_Rand_BreathResult = gv_long$V1_Rand_BreathResult$labels)) +  
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_grid(V1_Rand_BreathResult~StartEndVisit, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels, V1_Rand_BreathResult = gv_long$Base$V1_Rand_BreathResult$labels)) +  
   cutie_layer(title = "Difference in TRACK score compared to Day 0", subtitle = "Comparison between experimental groups, separated by breath test result")
 
-# Plot asthma attacks over time (yes/no)
+# customggsave(plot, upscale = 2, name = "track difference over time both groupings", save_path = "/TRACK/")
+
+### Fraction of well-controlled patients ----
+gv_long$UC = TRACK_plot_long %>%
+  subset(!is.na(UnderControl)) %>%
+  makeGroupValues("long")
+
+ann_text$UC = TRACK_plot_long %>%
+  subset(!is.na(UnderControl)) %>%
+  count(StartEndVisit, UnderControl, V1_Rand_RandGroup) %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  mutate(pct = n/sum(n))
+
+TRACK_plot_long %>%
+  subset(!is.na(UnderControl)) %>%
+  group_by(StartEndVisit) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, fill = UnderControl)) +
+  geom_bar_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, position = position_fill(reverse = T), pattern = "circle", pattern_fill = "white") +
+  geom_label(data = ann_text$UC, aes(y = pct, label = label_percent(1)(pct)), position = position_fill(reverse = T, vjust = .5), color = "black", fill = "white", show.legend = F) +
+  scale_x_discrete(name = gv_long$UC$V1_Rand_RandGroup$name, labels = gv_long$UC$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Proportion", labels = label_percent()) +
+  scale_fill_manual(name = gv_long$UC$Undercontrol$name, labels = gv_long$UC$Undercontrol$labels, values = gv_long$UC$Undercontrol$color) +
+  scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$UC$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Proportion of patients with symptoms under control")
+
+# customggsave(plot, upscale = 2, name = "proportion of patients under control", save_path = "/TRACK/")
+
+### Plot asthma attacks over time (yes/no) ----
+ann_text$SE_I2 = TRACK_plot_long %>% 
+  subset(!is.na(ISAACa02)) %>% 
+  subset(!(StartEndVisit %in% c("Day180","Day540"))) %>%
+  count(StartEndVisit, V1_Rand_RandGroup, ISAACa02) %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  mutate(pct = n/sum(n))
+
 TRACK_plot_long %>% 
   subset(!is.na(ISAACa02)) %>% 
   subset(!(StartEndVisit %in% c("Day180","Day540"))) %>%
   ggplot(aes(x = V1_Rand_RandGroup, fill = ISAACa02)) +
     geom_bar_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, position = position_fill(reverse = T), pattern = "circle", pattern_fill = "white") +
-    geom_label(aes(label = after_stat(count)), stat = "count", position = position_fill(reverse = T, vjust = .5), color = "black", show.legend = F) +
-    scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
+    geom_label(data = ann_text$SE_I2, aes(y = pct, label = label_percent(1)(pct)), position = position_fill(reverse = T, vjust = .5), fill = "white", color = "black", show.legend = F) +
+    #geom_label(aes(label = after_stat(count)), stat = "count", position = position_fill(reverse = T, vjust = .5), color = "black", show.legend = F) +
+    scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
     scale_y_continuous(name = "Proportion", labels = label_percent()) +
-    scale_fill_manual(name = gv_long$ISAACa02$name, labels = gv_long$ISAACa02$labelsabr, values = gv_long$ISAACa02$Colors) +
-    scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType, guide = "none") +  
+    scale_fill_manual(name = gv_long$Base$ISAACa02$name, labels = gv_long$Base$ISAACa02$labelsabr, values = gv_long$Base$ISAACa02$Colors) +
     scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +
-    facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Days$labels), strip.position = "bottom") +
-    cutie_layer(title = "Proportion of patients that had asthma attacks in the past 12 months")
+    facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +
+    cutie_layer(title = "Proportion of patients with asthma attacks in the previous 12 months")
 
-# Plot asthma attacks over time (number)
+# customggsave(plot, upscale = 2, name = "previous asthma attacks per group n", save_path = "/ISAAC/")
+
+### Plot asthma attacks over time (number) ----
 ann_text$SE_I3 = TRACK_plot_long %>% 
   subset(!is.na(ISAACa03)) %>% 
   subset(!(StartEndVisit %in% c("Day180","Day540"))) %>%
-  count(StartEndVisit, V1_Rand_BreathResult, V1_Rand_RandGroup, ISAACa03)
+  count(StartEndVisit, V1_Rand_RandGroup, ISAACa03) %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  mutate(pct = n/sum(n))
 
 TRACK_plot_long %>% 
   subset(!is.na(ISAACa03)) %>% 
   subset(!(StartEndVisit %in% c("Day180","Day540"))) %>%
   ggplot(aes(x = V1_Rand_RandGroup, fill = ISAACa03)) +
   geom_bar_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, position = position_fill(reverse = T), pattern = "circle", pattern_fill = "white") +
-    geom_label(aes(label = after_stat(count)), stat = "count", position = position_fill(reverse = T, vjust = .5), color = "black", show.legend = F) + 
-    scale_x_discrete(name = gv_long$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
+    geom_label(data = ann_text$SE_I3, aes(y = pct, label = label_percent(1)(pct)), position = position_fill(reverse = T, vjust = .5), color = "black", fill = "white", show.legend = F) +   
+    #geom_label(aes(label = after_stat(count)), stat = "count", position = position_fill(reverse = T, vjust = .5), color = "black", show.legend = F) + 
+    scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
     scale_y_continuous(name = "Proportion", labels = percent) +
-    scale_fill_manual(name = gv_long$ISAACa03$name, labels = gv_long$ISAACa03$labelsabr, values = gv_long$ISAACa03$Colors) +
-    scale_linetype_manual(name = gv_long$V1_Rand_RandGroup$name, labels = gv_long$V1_Rand_RandGroup$labels, values = gv_long$V1_Rand_RandGroup$LineType, guide = "none") +  
+    scale_fill_manual(name = gv_long$Base$ISAACa03$name, labels = gv_long$Base$ISAACa03$labelsabr, values = gv_long$Base$ISAACa03$Colors) +
     scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +  
-    facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Days$labels), strip.position = "bottom") +
-    cutie_layer(title = "Distribution of patients according to the amount of asthma attacks in the past 12 months")
+    facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +
+    cutie_layer(title = "Distribution of patients according to the amount of asthma attacks in the previous 12 months")
 
-# Box-plot number of asthma attacks
+# customggsave(plot, upscale = 2, name = "distribution of previous asthma attacks per group n", save_path = "/ISAAC/")
 
+### Distribution of total, direct and indirect costs per group (all) ----
+ann_text$HC_ALL_RG = TRACK_plot_long %>%
+  count(StartEndVisit, V1_Rand_RandGroup)
 
-# Wide-format plots
+TRACK_plot_long %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = DirectCost + IndirectCost, fill = V1_Rand_RandGroup)) +
+  geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  stat_summary(mapping = aes(label = euro_label(..y..)), fill = "white", fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
+  geom_text(data = ann_text$HC_ALL_RG, mapping = aes(y = Inf, label = paste("n =", n)), vjust = 1.5) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (€)", labels = euro_label) +
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels)) +  
+  cutie_layer(title = "Total costs to healthcare system in the previous three months", subtitle = "Comparison between experimental groups")
+
+# customggsave(plot, upscale = 2, name = "total costs over time", save_path = "/HCSRU/")
+# customggsave(plot, upscale = 2, name = "total costs over time no outliers", save_path = "/HCSRU/")
+
+TRACK_plot_long %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = DirectCost, fill = V1_Rand_RandGroup)) +
+  geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  stat_summary(mapping = aes(label = euro_label(..y..)), fill = "white", fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
+  geom_text(data = ann_text$HC_ALL_RG, mapping = aes(y = Inf, label = paste("n =", n)), vjust = 1.5) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (€)", labels = euro_label) +
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels)) +  
+  cutie_layer(title = "Direct costs to healthcare system in the previous three months", subtitle = "Comparison between experimental groups")
+
+# customggsave(plot, upscale = 2, name = "direct costs over time", save_path = "/HCSRU/")
+# customggsave(plot, upscale = 2, name = "direct costs over time no outliers", save_path = "/HCSRU/")
+
+TRACK_plot_long %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = IndirectCost, fill = V1_Rand_RandGroup)) +
+  geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  stat_summary(mapping = aes(label = euro_label(..y..)), fill = "white", fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
+  geom_text(data = ann_text$HC_ALL_RG, mapping = aes(y = Inf, label = paste("n =", n)), vjust = 1.5) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (€)", labels = euro_label) +
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels)) +  
+  cutie_layer(title = "Indirect costs to healthcare system in the previous three months", subtitle = "Comparison between experimental groups")
+
+# customggsave(plot, upscale = 2, name = "indirect costs over time", save_path = "/HCSRU/")
+# customggsave(plot, upscale = 2, name = "indirect costs over time no outliers", save_path = "/HCSRU/")
+
+### Distribution of total, direct, and indirect costs per group (non zero) ----
+ann_text$HC_NZDI_RG = TRACK_plot_long %>%
+  subset(DirectCost!=0 | IndirectCost!=0) %>%
+  count(StartEndVisit, V1_Rand_RandGroup)
+
+gv_long$NZDI = TRACK_plot_long %>%
+  subset(DirectCost!=0 | IndirectCost!=0) %>%
+  makeGroupValues(format = "long")
+
+TRACK_plot_long %>%
+  subset(DirectCost!=0 | IndirectCost!=0) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = DirectCost + IndirectCost, fill = V1_Rand_RandGroup)) +
+  geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  stat_summary(mapping = aes(label = euro_label(..y..)), fill = "white", fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
+  geom_text(data = ann_text$HC_NZDI_RG, mapping = aes(y = Inf, label = paste("n =", n)), vjust = 1.5) +
+  scale_x_discrete(name = gv_long$NZDI$V1_Rand_RandGroup$name, labels = gv_long$NZDI$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (€)", labels = euro_label) +
+  scale_fill_manual(name = gv_long$NZDI$V1_Rand_RandGroup$name, labels = gv_long$NZDI$V1_Rand_RandGroup$labels, values = gv_long$NZDI$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$NZDI$Days$labels)) +  
+  cutie_layer(title = "Non-zero total costs to healthcare system in the previous three months", subtitle = "Comparison between experimental groups")
+
+# customggsave(plot, upscale = 2, name = "total nonzero costs over time", save_path = "/HCSRU/")
+# customggsave(plot, upscale = 2, name = "total nonzero costs over time no outliers", save_path = "/HCSRU/")
+
+ann_text$HC_NZD_RG = TRACK_plot_long %>%
+  subset(DirectCost!=0) %>%
+  count(StartEndVisit, V1_Rand_RandGroup)
+
+gv_long$NZD = TRACK_plot_long %>%
+  subset(DirectCost!=0) %>%
+  makeGroupValues(format = "long")
+
+TRACK_plot_long %>%
+  subset(DirectCost!=0) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = DirectCost, fill = V1_Rand_RandGroup)) +
+  geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  stat_summary(mapping = aes(label = euro_label(..y..)), fill = "white", fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
+  geom_text(data = ann_text$HC_NZD_RG, mapping = aes(y = Inf, label = paste("n =", n)), vjust = 1.5) +
+  scale_x_discrete(name = gv_long$NZD$V1_Rand_RandGroup$name, labels = gv_long$NZD$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (€)", labels = euro_label) +
+  scale_fill_manual(name = gv_long$NZD$V1_Rand_RandGroup$name, labels = gv_long$NZD$V1_Rand_RandGroup$labels, values = gv_long$NZD$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$NZD$Days$labels)) +  
+  cutie_layer(title = "Non-zero direct costs to healthcare system in the previous three months", subtitle = "Comparison between experimental groups")
+
+# customggsave(plot, upscale = 2, name = "direct nonzero costs over time", save_path = "/HCSRU/")
+# customggsave(plot, upscale = 2, name = "direct nonzero costs over time no outliers", save_path = "/HCSRU/")
+
+ann_text$HC_NZI_RG = TRACK_plot_long %>%
+  subset(IndirectCost!=0) %>%
+  count(StartEndVisit, V1_Rand_RandGroup)
+
+gv_long$NZI = TRACK_plot_long %>%
+  subset(IndirectCost!=0) %>%
+  makeGroupValues(format = "long")
+
+TRACK_plot_long %>%
+  subset(IndirectCost!=0) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = IndirectCost, fill = V1_Rand_RandGroup)) +
+  geom_boxplot_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  stat_summary(mapping = aes(label = euro_label(..y..)), fill = "white", fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
+  geom_text(data = ann_text$HC_NZI_RG, mapping = aes(y = Inf, label = paste("n =", n)), vjust = 1.5) +
+  scale_x_discrete(name = gv_long$NZI$V1_Rand_RandGroup$name, labels = gv_long$NZI$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (€)", labels = euro_label) +
+  scale_fill_manual(name = gv_long$NZI$V1_Rand_RandGroup$name, labels = gv_long$NZI$V1_Rand_RandGroup$labels, values = gv_long$NZI$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$NZI$Days$labels)) +  
+  cutie_layer(title = "Non-zero indirect costs to healthcare system in the previous three months", subtitle = "Comparison between experimental groups")
+
+# customggsave(plot, upscale = 2, name = "indirect nonzero costs over time", save_path = "/HCSRU/")
+# customggsave(plot, upscale = 2, name = "indirect nonzero costs over time no outliers", save_path = "/HCSRU/")
+
+### Proportion of people with zero and nonzero costs ----
+ann_text$HC_NZDIp_RG = TRACK_plot_long %>%
+  mutate(NonZeroTotal = DirectCost > 0 | IndirectCost > 0) %>%
+  count(StartEndVisit, V1_Rand_RandGroup, NonZeroTotal) %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  mutate(pct = n/sum(n))
+
+gv_long$NZDIp = TRACK_plot_long %>%
+  mutate(NonZeroTotal = DirectCost > 0 | IndirectCost > 0) %>%
+  makeGroupValues(format = "long")
+
+plot = TRACK_plot_long %>% 
+  mutate(NonZeroTotal = DirectCost > 0 | IndirectCost > 0) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, fill = NonZeroTotal)) +
+  geom_bar_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, position = position_fill(reverse = T), pattern = "circle", pattern_fill = "white") +
+  geom_label(data = ann_text$HC_NZDIp_RG, aes(y = pct, label = label_percent(1)(pct)), position = position_fill(reverse = T, vjust = .5), fill = "white", color = "black", show.legend = F) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
+  scale_y_continuous(name = "Proportion", labels = label_percent()) +
+  scale_fill_manual(name = gv_long$NZDIp$NonZeroTotal$name, labels = gv_long$NZDIp$NonZeroTotal$labelsabr, values = gv_long$NZDIp$NonZeroTotal$Colors) +
+  scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$NZDIp$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Proportion of patients with non-zero total costs in the previous three months")
+
+# customggsave(plot, upscale = 2, name = "total nonzero proportion over time pct", save_path = "/HCSRU/") # label_percent(1)(pct)
+
+ann_text$HC_NZDp_RG = TRACK_plot_long %>%
+  mutate(NonZeroDirect = DirectCost > 0) %>%
+  count(StartEndVisit, V1_Rand_RandGroup, NonZeroDirect) %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  mutate(pct = n/sum(n))
+
+gv_long$NZDp = TRACK_plot_long %>%
+  mutate(NonZeroDirect = DirectCost > 0) %>%
+  makeGroupValues(format = "long")
+
+TRACK_plot_long %>% 
+  mutate(NonZeroDirect = DirectCost > 0) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, fill = NonZeroDirect)) +
+  geom_bar_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, position = position_fill(reverse = T), pattern = "circle", pattern_fill = "white") +
+  geom_label(data = ann_text$HC_NZDp_RG, aes(y = pct, label = n), position = position_fill(reverse = T, vjust = .5), fill = "white",  color = "black", show.legend = F) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
+  scale_y_continuous(name = "Proportion", labels = label_percent()) +
+  scale_fill_manual(name = gv_long$NZDp$NonZeroDirect$name, labels = gv_long$NZDp$NonZeroDirect$labelsabr, values = gv_long$NZDp$NonZeroDirect$Colors) +
+  scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$NZDp$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Proportion of patients with non-zero direct costs in the previous three months")
+
+# customggsave(plot, upscale = 2, name = "direct nonzero proportion over time n", save_path = "/HCSRU/") # label_percent(1)(pct)
+
+ann_text$HC_NZIp_RG = TRACK_plot_long %>%
+  mutate(NonZeroIndirect = IndirectCost > 0) %>%
+  count(StartEndVisit, V1_Rand_RandGroup, NonZeroIndirect) %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  mutate(pct = n/sum(n))
+
+gv_long$NZIp = TRACK_plot_long %>%
+  mutate(NonZeroIndirect = IndirectCost > 0) %>%
+  makeGroupValues(format = "long")
+
+TRACK_plot_long %>% 
+  mutate(NonZeroIndirect = IndirectCost > 0) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, fill = NonZeroIndirect)) +
+  geom_bar_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", linewidth = 1, position = position_fill(reverse = T), pattern = "circle", pattern_fill = "white") +
+  geom_label(data = ann_text$HC_NZIp_RG, aes(y = pct, label = label_percent(1)(pct)), position = position_fill(reverse = T, vjust = .5), fill = "white", color = "black", show.legend = F) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = c("Control", "Intervention")) +
+  scale_y_continuous(name = "Proportion", labels = label_percent()) +
+  scale_fill_manual(name = gv_long$NZIp$NonZeroIndirect$name, labels = gv_long$NZIp$NonZeroIndirect$labelsabr, values = gv_long$NZIp$NonZeroIndirect$Colors) +
+  scale_pattern_density_manual(values = c(0, 0.5), guide = "none") +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$NZIp$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Proportion of patients with non-zero indirect costs in the previous three months")
+
+# customggsave(plot, upscale = 2, name = "indirect nonzero proportion over time pct", save_path = "/HCSRU/") # label_percent(1)(pct)
+
+### Sum total of total, direct, and indirect costs per group ----
+TRACK_plot_long %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  summarise(sumTotal = sum(DirectCost + IndirectCost)) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = sumTotal, fill = V1_Rand_RandGroup)) +
+  geom_col_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  geom_label(aes(label = euro_label_thousand(after_stat(y))), fill = "white", position = position_dodge(width = 0.75), show.legend = F) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (1000 €)", labels = euro_label_thousand) +
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Sum total costs to healthcare system in the previous three months")
+
+# customggsave(plot, upscale = 2, name = "sum total costs over time", save_path = "/HCSRU/")
+
+TRACK_plot_long %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  summarise(sumDirect = sum(DirectCost)) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = sumDirect, fill = V1_Rand_RandGroup)) +
+  geom_col_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  geom_label(aes(label = euro_label_thousand(after_stat(y))), fill = "white", position = position_dodge(width = 0.75), show.legend = F) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (1000 €)", labels = euro_label_thousand) +
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Sum total of direct costs to healthcare system in the previous three months")
+
+# customggsave(plot, upscale = 2, name = "sum direct costs over time", save_path = "/HCSRU/")
+
+TRACK_plot_long %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  summarise(sumIndirect = sum(IndirectCost)) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = sumIndirect, fill = V1_Rand_RandGroup)) +
+  geom_col_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  geom_label(aes(label = euro_label_thousand(after_stat(y))), fill = "white", position = position_dodge(width = 0.75), show.legend = F) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (1000 €)", labels = euro_label_thousand) +
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Sum total of indirect costs to healthcare system in the previous three months")
+
+# customggsave(plot, upscale = 2, name = "sum indirect costs over time", save_path = "/HCSRU/")
+
+### Total, direct and indirect cost per child (mean) ----
+TRACK_plot_long %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  summarise(meanTotal = mean(DirectCost + IndirectCost)) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = meanTotal, fill = V1_Rand_RandGroup)) +
+  geom_col_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  geom_label(aes(label = euro_label(after_stat(y))), fill = "white", position = position_dodge(width = 0.75), show.legend = F) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (€)", labels = euro_label) +
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Total costs to healthcare system per child in the previous three months")
+
+# customggsave(plot, upscale = 2, name = "total costs per child over time", save_path = "/HCSRU/")
+
+TRACK_plot_long %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  summarise(meanDirect = mean(DirectCost)) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = meanDirect, fill = V1_Rand_RandGroup)) +
+  geom_col_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  geom_label(aes(label = euro_label(after_stat(y))), fill = "white", position = position_dodge(width = 0.75), show.legend = F) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (€)", labels = euro_label) +
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Direct costs per child to healthcare system in the previous three months")
+
+# customggsave(plot, upscale = 2, name = "direct costs per child over time", save_path = "/HCSRU/")
+
+TRACK_plot_long %>%
+  group_by(StartEndVisit, V1_Rand_RandGroup) %>%
+  summarise(meanIndirect = mean(IndirectCost)) %>%
+  ggplot(aes(x = V1_Rand_RandGroup, y = meanIndirect, fill = V1_Rand_RandGroup)) +
+  geom_col_pattern(aes(pattern_density = V1_Rand_RandGroup), color = "black", pattern = "circle", pattern_fill = "white", show.legend = F) +
+  geom_label(aes(label = euro_label(after_stat(y))), fill = "white", position = position_dodge(width = 0.75), show.legend = F) +
+  scale_x_discrete(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labelsabr) +
+  scale_y_continuous(name = "Cost (€)", labels = euro_label) +
+  scale_fill_manual(name = gv_long$Base$V1_Rand_RandGroup$name, labels = gv_long$Base$V1_Rand_RandGroup$labels, values = gv_long$Base$V1_Rand_RandGroup$Colors) +
+  facet_wrap(~StartEndVisit, nrow = 1, labeller = labeller(StartEndVisit = gv_long$Base$Days$labels), strip.position = "bottom") +
+  cutie_layer(title = "Indirect costs per child to healthcare system in the previous three months")
+
+# customggsave(plot, upscale = 2, name = "indirect costs per child over time", save_path = "/HCSRU/")
+
+## Wide-format plots ----
 TRACK_plot_wide = TRACK_wide
 TRACK_plot_wide = subset(TRACK_plot_wide, !is.na(V1_Rand_RandGroup))
 TRACK_plot_wide = subset(TRACK_plot_wide, !is.na(V1_Rand_BreathResult))
 gv_wide = makeGroupValues(TRACK_plot_wide, "wide")
 
-# Direct and indirect costs per group
+### Direct and indirect costs per group ----
 TRACK_plot_wide %>% 
   pivot_longer(cols = c("DirectCost", "IndirectCost"), names_to = "SourceCost", values_to = "Cost") %>%
   ggplot(aes(x = V1_Rand_RandGroup, y = Cost, fill = V1_Rand_RandGroup, linetype = V1_Rand_RandGroup)) +
     geom_boxplot(linewidth = 1) +
     stat_summary(mapping = aes(label = euro_label(..y..)), fun = "median", geom = "label", position = position_dodge(width = 0.75), show.legend = F) +
-    scale_x_discrete(name = gv_wide$V1_Rand_RandGroup$name, labels = gv_wide$V1_Rand_RandGroup$labels) +
+    scale_x_discrete(name = gv_wide$V1_Rand_RandGroup$name, labels = gv_wide$V1_Rand_RandGroup$labelsabr) +
     scale_y_continuous(name = "Total cost", labels = euro_label) +
     scale_fill_manual(name = gv_wide$V1_Rand_RandGroup$name, labels = gv_wide$V1_Rand_RandGroup$labels, values = gv_wide$V1_Rand_RandGroup$Colors, guide = "none") +
     scale_linetype_manual(name = gv_wide$V1_Rand_RandGroup$name, labels = gv_wide$V1_Rand_RandGroup$labels, values = gv_wide$V1_Rand_RandGroup$LineType, guide = "none") +
     facet_wrap(~SourceCost, nrow = 1, labeller = labeller(SourceCost = gv_wide$HCSRU$labels)) + 
     cutie_layer(title = "Distribution of direct and indirect costs across patients")
 
-# Total cost per group
+### Total cost per group ----
 TRACK_plot_wide %>% 
   pivot_longer(cols = c("DirectCost", "IndirectCost"), names_to = "SourceCost", values_to = "Cost") %>%
   ggplot(aes(x = V1_Rand_RandGroup, y = Cost, fill = V1_Rand_RandGroup, linetype = V1_Rand_RandGroup)) +
@@ -564,10 +925,10 @@ TRACK_plot_wide %>%
   facet_grid(V1_Rand_BreathResult~SourceCost, labeller = labeller(V1_Rand_BreathResult = gv_wide$V1_Rand_BreathResult$labelsabr, SourceCost = gv_wide$HCSRU$labels)) + 
   cutie_layer(title = "Distribution of direct and indirect costs across patients")
 
-# Save
-customggsave(plot, upscale = 2, name = "number of previous asthma attacks per experimental group")
+## Save ----
+# customggsave(plot, upscale = 2, name = "total costs over time")
 
-## Statistical tests ----
+# Statistical tests ----
 # Chosen tests from https://www.scribbr.com/statistics/statistical-tests/
 
 ## Linear regression ----
